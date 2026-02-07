@@ -965,7 +965,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
           </div>
         </div>
 
-        <div className="p-4 md:p-6 bg-white border-t border-slate-200">
+        <div className="p-4 md:p-6 bg-white border-t border-slate-200 pb-24 md:pb-6">
           <div className="flex justify-between items-center mb-4">
             <span className="text-slate-500 font-medium">Total Estimated Cost</span>
             <span className="text-2xl font-bold text-blue-600">
@@ -1010,7 +1010,7 @@ function PrescriptionView({ data, doctor, onBack }) {
         {/* WRAPPER: UPDATED FOR FLEXIBLE WIDTH PRINTING & FLEX LAYOUT */}
         <div className="printable-wrapper bg-white w-full max-w-2xl shadow-2xl p-6 md:p-12 relative text-slate-900 font-serif border border-slate-100">
           
-          {/* FIXED WATERMARK: Moved to wrapper level to center on page */}
+          {/* FIXED WATERMARK: Centered in wrapper */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
             <div className="rx-watermark text-[8rem] md:text-[10rem] font-bold text-slate-200/50 font-sans italic select-none">Rx</div>
           </div>
@@ -1101,7 +1101,8 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
           </button>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <table className="w-full text-left">
+          {/* DESKTOP TABLE */}
+          <table className="w-full text-left hidden md:table">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-bold text-slate-500 tracking-wider">
                 <th className="px-6 py-4">Medicine Name</th>
@@ -1131,6 +1132,31 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
               )}
             </tbody>
           </table>
+
+          {/* MOBILE LIST (Cards) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filtered.length === 0 ? (
+               <div className="p-8 text-center text-slate-400">No medicines found.</div>
+            ) : (
+               filtered.map(med => (
+                 <div key={med.id} className="p-4 flex flex-col gap-3">
+                    <div className="flex justify-between items-start">
+                       <div>
+                          <div className="font-bold text-slate-800 text-lg">{med.name}</div>
+                          <div className="text-sm text-slate-500 mt-1 inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100 font-medium">{med.dosage}</div>
+                       </div>
+                       <div className="text-lg font-bold text-emerald-600">₱{med.price.toFixed(2)}</div>
+                    </div>
+                    <button 
+                      onClick={() => onDelete(med.id)} 
+                      className="mt-1 w-full flex items-center justify-center gap-2 text-red-600 bg-red-50 py-3 rounded-xl font-bold active:scale-95 transition-all hover:bg-red-100"
+                    >
+                       <Trash2 className="w-4 h-4" /> Remove Item
+                    </button>
+                 </div>
+               ))
+            )}
+          </div>
         </div>
       </div>
       {isModalOpen && (
