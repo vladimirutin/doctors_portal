@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.css": "/doctors_portal/static/css/main.31d6cfe0.css",
+    "main.js": "/doctors_portal/static/js/main.768d6892.js",
+    "index.html": "/doctors_portal/index.html",
+    "main.768d6892.js.map": "/doctors_portal/static/js/main.768d6892.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31d6cfe0.css",
+    "static/js/main.768d6892.js"
+  ]
+}
