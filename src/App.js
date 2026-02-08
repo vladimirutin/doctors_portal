@@ -28,7 +28,11 @@ import {
   CheckCircle2,
   Mail,
   Eye,
-  Key
+  Key,
+  ArrowRight,
+  Sparkles,
+  Award,
+  HelpCircle
 } from 'lucide-react';
 import { initializeApp } from "firebase/app";
 import { 
@@ -202,20 +206,31 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 overflow-x-hidden">
-      {/* PRINT ENGINE: ROBUST FLOW LAYOUT TO PREVENT OVERLAP ON LETTER/A4 */}
+    <div className="h-[100dvh] bg-[#F3F4F6] font-sans text-slate-800 overflow-hidden flex flex-col">
+      {/* PRINT ENGINE & GLOBAL STYLES */}
       <style>
         {`
+          /* Modern Input Field Style */
+          .input-modern {
+             background-color: #f9fafb;
+             border: 1px solid #e5e7eb;
+             transition: all 0.2s ease;
+          }
+          .input-modern:focus {
+             background-color: white;
+             border-color: #6366f1; /* Indigo-500 */
+             box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+          }
+
           @media print {
             @page {
-              size: auto; /* Adapts to Letter, A4, etc */
-              margin: 0.5in; /* Standard Office Margin */
+              size: auto; 
+              margin: 0.5in;
             }
             .no-print {
               display: none !important;
             }
             
-            /* Strictly hide navigation in print */
             nav, .mobile-nav-bar {
               display: none !important;
             }
@@ -228,11 +243,10 @@ export default function App() {
               overflow: visible !important;
             }
             
-            /* Main Print Container */
             .printable-wrapper {
               display: flex !important;
               flex-direction: column !important;
-              min-height: 90vh !important; /* Use 90vh to stay safe within page margins */
+              min-height: 90vh !important;
               width: 100% !important;
               margin: 0 !important;
               padding: 0 !important;
@@ -240,13 +254,11 @@ export default function App() {
               border: none !important;
             }
 
-            /* Content Area - Expands to fill space */
             .printable-content {
-              flex: 1 0 auto !important; /* Grow, don't shrink */
-              padding-bottom: 20px !important; /* Buffer before footer */
+              flex: 1 0 auto !important;
+              padding-bottom: 20px !important;
             }
 
-            /* Footer - Pushed to bottom via flex, but flows naturally if content is long */
             .printable-footer {
               flex-shrink: 0 !important;
               margin-top: auto !important;
@@ -256,15 +268,13 @@ export default function App() {
               border-top: 1px solid #e2e8f0 !important;
             }
 
-            /* --- COMPACT TYPOGRAPHY FOR LETTER/A4 --- */
             .printable-wrapper h1 { font-size: 18pt !important; line-height: 1.2 !important; margin-bottom: 5px !important; }
             .printable-wrapper p, .printable-wrapper span { font-size: 10pt !important; }
             .printable-wrapper .text-xs { font-size: 8pt !important; }
             .printable-wrapper .text-sm { font-size: 9pt !important; }
             .printable-wrapper .text-lg { font-size: 11pt !important; }
-            .printable-wrapper .text-4xl { font-size: 20pt !important; } /* Rx Symbol */
+            .printable-wrapper .text-4xl { font-size: 20pt !important; }
 
-            /* Dense Table for 10+ items */
             .printable-wrapper table td,
             .printable-wrapper table th {
               padding-top: 4px !important;
@@ -272,16 +282,14 @@ export default function App() {
               font-size: 10pt !important;
             }
             
-            /* Watermark adjustments - SIGNIFICANTLY DARKER */
             .rx-watermark {
                font-size: 8rem !important;
-               color: #94a3b8 !important; /* Darker Slate-400 for better print visibility */
-               opacity: 0.3 !important; /* Increased to 0.3 */
+               color: #94a3b8 !important;
+               opacity: 0.3 !important;
                -webkit-print-color-adjust: exact !important;
                print-color-adjust: exact !important;
             }
             
-            /* Override tailwind min-height in print */
             .print-min-h-reset {
               min-height: auto !important;
             }
@@ -293,65 +301,69 @@ export default function App() {
       {currentView === 'onboarding' && <OnboardingScreen onComplete={handleOnboardingComplete} user={user} />}
       
       {['dashboard', 'prescription', 'history', 'settings', 'medicines'].includes(currentView) && (
-        <div className="flex h-screen overflow-hidden bg-slate-100 print:bg-white print:block">
-          {/* DESKTOP SIDEBAR */}
-          <aside className="no-print w-72 bg-[#0f172a] text-slate-400 flex-col hidden md:flex border-r border-slate-800 shadow-xl z-30">
-            <div className="p-6 flex items-center gap-3 border-b border-slate-800/50">
-              <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
+        <div className="flex h-full overflow-hidden bg-[#0B0F19] print:bg-white print:block">
+          {/* DESKTOP SIDEBAR - Deep Navy (#0B0F19) */}
+          <aside className="no-print w-72 bg-[#0B0F19] text-slate-300 flex-col hidden md:flex border-r border-white/5 shadow-2xl z-30 relative overflow-hidden">
+              
+             <div className="relative z-10 p-6 flex items-center gap-3 border-b border-white/5">
+              <div className="bg-gradient-to-tr from-indigo-500 to-blue-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20 ring-1 ring-white/10">
                 <Stethoscope className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="font-bold text-white text-lg tracking-wide">MediVend</h1>
-                <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Doctor Portal</p>
+                <p className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">Doctor Portal</p>
               </div>
             </div>
             
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-              <div className="px-3 mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">Workspace</div>
+            <nav className="relative z-10 flex-1 p-4 space-y-2 overflow-y-auto">
+              <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-500/80">Clinical Workspace</div>
               <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="New Prescription" />
-              <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="History Logs" />
+              <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" />
               
-              <div className="px-3 mt-6 mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">Inventory</div>
+              <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-500/80">Management</div>
                <NavButton active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill className="w-5 h-5" />} label="Medicine List" />
 
-              <div className="px-3 mt-6 mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">Preferences</div>
+              <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-500/80">System</div>
               <NavButton active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings className="w-5 h-5" />} label="Account Settings" />
             </nav>
 
-            <div className="p-4 bg-slate-900 border-t border-slate-800">
-              <div className="flex items-center gap-3 mb-4 p-3 bg-slate-800 rounded-xl border border-slate-700">
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+            <div className="relative z-10 p-4 bg-[#05080F] border-t border-white/5">
+              <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                   {user?.name?.charAt(0) || 'D'}
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-                  <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                  <p className="text-xs text-slate-400 truncate">{user?.email}</p>
                 </div>
               </div>
-              <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all text-sm font-medium">
-                <LogOut className="w-4 h-4" /> Sign Out
+              <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 transition-all text-sm font-medium group">
+                <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Sign Out
               </button>
             </div>
           </aside>
 
-          {/* MAIN CONTENT AREA */}
-          <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative print:block">
-            <header className="no-print bg-white h-16 border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-20 shrink-0">
+          {/* MAIN CONTENT AREA - DEEP NAVY BG for layout */}
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative print:block bg-[#0B0F19]">
+            <header className="no-print bg-[#0B0F19] border-b border-white/5 flex items-center justify-between px-4 md:px-8 shadow-md z-20 shrink-0 sticky top-0">
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-slate-800 tracking-tight capitalize">
-                  {currentView === 'dashboard' ? 'Prescription Writer' : 
-                   currentView === 'medicines' ? 'Medicine Inventory' : currentView}
+                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight capitalize flex items-center gap-2">
+                  {currentView === 'dashboard' ? <><LayoutDashboard className="w-5 h-5 text-indigo-400"/> New Prescription</> : 
+                   currentView === 'medicines' ? <><Pill className="w-5 h-5 text-emerald-400"/> Medicine List</> : 
+                   currentView === 'history' ? <><History className="w-5 h-5 text-indigo-400"/> Patient History</> :
+                   currentView === 'prescription' ? <><Printer className="w-5 h-5 text-indigo-400"/> Prescription Preview</> :
+                   <><Settings className="w-5 h-5 text-slate-400"/> Account Settings</>}
                 </h2>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-xs md:text-sm font-medium text-slate-500 flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-                  <Clock className="w-4 h-4 text-blue-600" /> {new Date().toLocaleDateString()}
+                <div className="text-xs md:text-sm font-medium text-slate-300 flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                  <Clock className="w-3.5 h-3.5 text-indigo-400" /> <span className="font-semibold text-slate-200">{new Date().toLocaleDateString()}</span>
                 </div>
               </div>
             </header>
 
-            {/* VIEWS CONTAINER with mobile padding bottom - REMOVED PADDING ON PRINT */}
-            <main className="flex-1 overflow-hidden relative bg-slate-50/50 print:bg-white print:overflow-visible pb-20 md:pb-0 print:pb-0">
+            {/* VIEWS CONTAINER */}
+            <main className="flex-1 overflow-hidden relative bg-transparent print:bg-white print:overflow-visible pb-20 md:pb-0 print:pb-0">
               {currentView === 'dashboard' && (
                 <Dashboard 
                   user={user} 
@@ -379,11 +391,11 @@ export default function App() {
             </main>
 
             {/* MOBILE BOTTOM NAVIGATION - HIDDEN ON PRINT */}
-            <nav className="mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around px-2 py-3 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-              <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="Writer" />
+            <nav className="mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 bg-[#0B0F19] border-t border-white/10 flex justify-around px-2 py-3 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.3)] pb-safe">
+              <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="New Rx" />
               <NavButtonMobile active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History />} label="History" />
-              <NavButtonMobile active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill />} label="Meds" />
-              <NavButtonMobile active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings />} label="Config" />
+              <NavButtonMobile active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill />} label="Meds List" />
+              <NavButtonMobile active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings />} label="Account" />
             </nav>
           </div>
         </div>
@@ -394,7 +406,8 @@ export default function App() {
 
 // ... AuthScreen, OnboardingScreen remain unchanged ...
 
-// --- SUB-COMPONENTS (INCLUDED FOR CONTEXT) ---
+// --- SUB-COMPONENTS ---
+
 function AuthScreen({ onAuthSuccess, db, appId }) {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', license: '' });
@@ -500,22 +513,27 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   };
 
   return (
-    <div className="flex h-screen w-full bg-white font-sans text-slate-900 overflow-hidden">
-      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center p-8 lg:p-12 overflow-y-auto">
-        <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
-          <div className="text-center lg:text-left">
-            <div className="inline-flex items-center justify-center p-3 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/20 mb-6 transform transition-transform hover:scale-105">
+    <div className="flex h-screen w-full bg-[#0B0F19] font-sans text-slate-900 overflow-hidden relative">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
+      
+      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center p-6 md:p-12 relative z-10 overflow-y-auto">
+        {/* LOGIN CARD */}
+        <div className="w-full max-w-md bg-white p-10 rounded-3xl shadow-2xl border-4 border-slate-200/20 animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden ring-1 ring-white/10 mb-6">
+          
+          <div className="text-center mb-8 relative z-10">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-2xl shadow-lg shadow-indigo-500/30 mb-6 transform transition-transform hover:scale-105 ring-4 ring-white">
               <Stethoscope className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-              {isLogin ? 'Welcome back' : 'Create an account'}
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+              {isLogin ? 'Welcome Back' : 'Join MediVend'}
             </h2>
-            <p className="mt-2 text-slate-500">
-              {isLogin ? 'Please enter your details to access your dashboard.' : 'Sign up to start prescribing digitally with MediVend.'}
+            <p className="text-slate-500 text-sm">
+              {isLogin ? 'Enter your credentials to access your dashboard.' : 'Start your digital prescription journey today.'}
             </p>
           </div>
+
           {pendingUserEmail && (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-start gap-3 animate-in fade-in">
               <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold">Account Pending Approval</p>
@@ -523,112 +541,151 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
               </div>
             </div>
           )}
-          <form onSubmit={handleSubmit} className="space-y-5">
+
+          <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
             {!isLogin && (
               <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
-                  <div className="relative group">
-                    <User className="w-5 h-5 absolute left-3 top-3 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    <input required type="text" className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder-slate-400" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                  </div>
+                <div className="relative group">
+                   <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Full Name</label>
+                   <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                      </div>
+                      <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Medical License No.</label>
-                  <div className="relative group">
-                    <FileBadge className="w-5 h-5 absolute left-3 top-3 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    <input required type="text" className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder-slate-400" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
-                  </div>
+                <div className="relative group">
+                   <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Medical License</label>
+                   <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FileBadge className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                      </div>
+                      <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
+                   </div>
                 </div>
               </div>
             )}
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
-              <div className="relative group">
-                <Mail className="w-5 h-5 absolute left-3 top-3 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                <input required type="email" className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder-slate-400" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-              </div>
+            
+            <div className="relative group">
+               <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Email Address</label>
+               <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                  </div>
+                  <input required type="email" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+               </div>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
-              <div className="relative group">
-                <Lock className="w-5 h-5 absolute left-3 top-3 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                <input required type="password" className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all placeholder-slate-400" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-              </div>
+
+            <div className="relative group">
+               <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Password</label>
+               <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                  </div>
+                  <input required type="password" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+               </div>
             </div>
+
             {error && (
-              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 flex items-center gap-2 animate-in slide-in-from-top-2">
                 <AlertCircle className="w-4 h-4" /> {error}
               </div>
             )}
-            <button type="submit" disabled={isLoading || lockoutTimer > 0} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-600/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-[0.98] flex justify-center items-center">
+
+            <button type="submit" disabled={isLoading || lockoutTimer > 0} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] flex justify-center items-center">
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : lockoutTimer > 0 ? (
                 `Try again in ${lockoutTimer}s`
               ) : (
-                isLogin ? 'Sign In' : 'Create Account'
+                <>
+                  {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4 ml-2" />
+                </>
               )}
             </button>
           </form>
-          <div className="text-center">
+
+          <div className="mt-8 text-center relative z-10">
             <p className="text-sm text-slate-600">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               <button 
                 onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); }} 
-                className="ml-2 text-blue-600 font-bold hover:text-blue-700 transition-colors"
+                className="ml-2 text-indigo-600 font-bold hover:text-indigo-700 transition-colors hover:underline"
               >
                 {isLogin ? 'Sign up for free' : 'Log in'}
               </button>
             </p>
           </div>
-          <div className="pt-8 mt-8 border-t border-slate-100 text-center lg:text-left opacity-80 hover:opacity-100 transition-opacity">
-             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 text-xs text-slate-400">
-                <div className="bg-slate-50 p-2 rounded-lg border border-slate-200">
-                   <ShieldCheck className="w-6 h-6 text-emerald-500" />
-                </div>
-                <div className="space-y-1 text-center lg:text-left">
-                   <p className="font-semibold text-slate-600">MediVend Healthcare Inc.</p>
-                   <p>Customer Service: <span className="font-mono text-slate-500">(02) 8-7000</span></p>
-                   <p>FDA License: <span className="font-mono bg-slate-100 px-1 rounded text-slate-600">LTO-30000012345</span></p>
-                   <p>© 2023 MediVend Systems. Secure & Compliant.</p>
-                </div>
-             </div>
+        </div>
+
+        {/* NEW FOOTER SECTION FOR LICENSES */}
+        <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 delay-100">
+          <div className="grid grid-cols-2 gap-3 text-[10px] text-slate-400 bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-md">
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="flex items-center gap-2 mb-1 text-indigo-300 font-bold uppercase tracking-wider">
+                 <ShieldCheck className="w-3 h-3"/> App License
+              </div>
+              <p className="font-mono text-slate-300">MV-WEB-2026-001</p>
+            </div>
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="flex items-center gap-2 mb-1 text-emerald-300 font-bold uppercase tracking-wider">
+                 <Award className="w-3 h-3"/> FDA License
+              </div>
+              <p className="font-mono text-slate-300">CDRR-NCR-DI-882</p>
+            </div>
+            <div className="col-span-2 p-2 rounded-lg bg-white/5 border border-white/5 flex justify-between items-center">
+               <div className="flex items-center gap-2 text-amber-300 font-bold uppercase tracking-wider">
+                 <HelpCircle className="w-3 h-3"/> Customer Service
+               </div>
+               <p className="font-mono text-slate-300 flex items-center gap-2 font-bold">
+                 <Phone className="w-3 h-3"/> (02) 8-7000-000
+               </p>
+            </div>
+          </div>
+          <div className="mt-4 text-center text-xs text-slate-500/50">
+             <p>© 2026 MediVend Systems. Secure & Compliant.</p>
           </div>
         </div>
+
       </div>
-      <div className="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900 via-slate-900 to-slate-950"></div>
+
+      {/* Right Side Hero */}
+      <div className="hidden lg:flex w-1/2 bg-[#0B0F19] relative overflow-hidden items-center justify-center border-l border-white/5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        
         <div className="relative z-10 p-12 text-white max-w-lg">
-          <div className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-sm">
-            <Activity className="w-3 h-3" /> Secure Prescription System
+          <div className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-indigo-300 text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-md">
+            <Activity className="w-3 h-3" /> Professional Healthcare Suite
           </div>
-          <h1 className="text-5xl font-bold mb-6 leading-tight tracking-tight">
-            The Future of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Digital Care</span>
+          <h1 className="text-5xl font-bold mb-6 leading-tight tracking-tight text-white drop-shadow-sm">
+            Digital Prescriptions <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Reimagined.</span>
           </h1>
           <p className="text-lg text-slate-400 mb-10 leading-relaxed font-light">
-            Generate secure, trackable prescriptions in seconds. Connect directly with MediVend kiosks for seamless, contactless fulfillment.
+            Generate secure, trackable prescriptions in seconds. Seamlessly integrated with MediVend kiosks for instant patient fulfillment.
           </p>
+          
           <div className="grid grid-cols-2 gap-4">
-             <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 backdrop-blur-md hover:bg-slate-800/60 transition-colors">
-                <Printer className="w-8 h-8 text-emerald-400 mb-4" />
-                <h3 className="font-bold text-white">Instant Generation</h3>
-                <p className="text-xs text-slate-400 mt-1">Create Rx slips instantly.</p>
+             {/* Feature Cards */}
+             <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
+                <Printer className="w-8 h-8 text-emerald-400 mb-3" />
+                <h3 className="font-bold text-white text-sm">Instant Printing</h3>
+                <p className="text-xs text-slate-400 mt-1">One-click PDF generation</p>
              </div>
-             <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 backdrop-blur-md hover:bg-slate-800/60 transition-colors">
-                <QrCode className="w-8 h-8 text-blue-400 mb-4" />
-                <h3 className="font-bold text-white">QR Integration</h3>
-                <p className="text-xs text-slate-400 mt-1">Secure kiosk dispensing.</p>
+             <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
+                <QrCode className="w-8 h-8 text-blue-400 mb-3" />
+                <h3 className="font-bold text-white text-sm">QR Validation</h3>
+                <p className="text-xs text-slate-400 mt-1">Secure dispensing verification</p>
              </div>
-             <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 backdrop-blur-md hover:bg-slate-800/60 transition-colors">
-                <ShieldCheck className="w-8 h-8 text-amber-400 mb-4" />
-                <h3 className="font-bold text-white">Fully Compliant</h3>
-                <p className="text-xs text-slate-400 mt-1">FDA & DOH Standards.</p>
+             <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
+                <ShieldCheck className="w-8 h-8 text-amber-400 mb-3" />
+                <h3 className="font-bold text-white text-sm">FDA Compliant</h3>
+                <p className="text-xs text-slate-400 mt-1">Meets all regulatory standards</p>
              </div>
-             <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50 backdrop-blur-md hover:bg-slate-800/60 transition-colors">
-                <CheckCircle2 className="w-8 h-8 text-purple-400 mb-4" />
-                <h3 className="font-bold text-white">Track Record</h3>
-                <p className="text-xs text-slate-400 mt-1">History at your fingertips.</p>
+             <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
+                <History className="w-8 h-8 text-purple-400 mb-3" />
+                <h3 className="font-bold text-white text-sm">Smart History</h3>
+                <p className="text-xs text-slate-400 mt-1">Track patient records easily</p>
              </div>
           </div>
         </div>
@@ -641,7 +698,7 @@ function OnboardingScreen({ onComplete, user }) {
   const [details, setDetails] = useState({ name: '', address: '', contactNumber: '', ptr: '', s2: '' });
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-2xl p-8 rounded-2xl shadow-xl border border-slate-200">
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Clinic Setup</h2>
         <p className="text-slate-500 mb-6 text-sm">Please provide your clinic details for the prescription header.</p>
@@ -649,26 +706,26 @@ function OnboardingScreen({ onComplete, user }) {
         <form onSubmit={(e) => { e.preventDefault(); onComplete(details); }} className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Clinic Name</label>
-            <input required type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. City General Hospital" value={details.name} onChange={e => setDetails({...details, name: e.target.value})} />
+            <input required type="text" className="w-full px-4 py-3 input-modern rounded-xl outline-none" placeholder="e.g. City General Hospital" value={details.name} onChange={e => setDetails({...details, name: e.target.value})} />
           </div>
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Address</label>
-            <input required type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Complete Address" value={details.address} onChange={e => setDetails({...details, address: e.target.value})} />
+            <input required type="text" className="w-full px-4 py-3 input-modern rounded-xl outline-none" placeholder="Complete Address" value={details.address} onChange={e => setDetails({...details, address: e.target.value})} />
           </div>
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Contact Number</label>
-            <input required type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Tel / Mobile" value={details.contactNumber} onChange={e => setDetails({...details, contactNumber: e.target.value})} />
+            <input required type="text" className="w-full px-4 py-3 input-modern rounded-xl outline-none" placeholder="Tel / Mobile" value={details.contactNumber} onChange={e => setDetails({...details, contactNumber: e.target.value})} />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">PTR No.</label>
-            <input required type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="PTR-XXXXX" value={details.ptr} onChange={e => setDetails({...details, ptr: e.target.value})} />
+            <input required type="text" className="w-full px-4 py-3 input-modern rounded-xl outline-none" placeholder="PTR-XXXXX" value={details.ptr} onChange={e => setDetails({...details, ptr: e.target.value})} />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">S2 License (Optional)</label>
-            <input type="text" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="S2-XXXXX" value={details.s2} onChange={e => setDetails({...details, s2: e.target.value})} />
+            <input type="text" className="w-full px-4 py-3 input-modern rounded-xl outline-none" placeholder="S2-XXXXX" value={details.s2} onChange={e => setDetails({...details, s2: e.target.value})} />
           </div>
           <div className="md:col-span-2 mt-4">
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition-all">Save & Continue</button>
+            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition-all">Save & Continue</button>
           </div>
         </form>
       </div>
@@ -754,39 +811,39 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
   return (
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden relative bg-white md:bg-transparent">
       {/* MOBILE TABS */}
-      <div className="md:hidden no-print flex bg-white border-b border-slate-200 shrink-0 sticky top-0 z-30">
+      <div className="md:hidden no-print flex bg-[#1e293b] border-b border-slate-700 shrink-0 sticky top-0 z-30">
         <button 
           onClick={() => setMobileView('editor')} 
-          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'editor' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-slate-500'}`}
+          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'editor' ? 'text-indigo-400 border-b-2 border-indigo-400 bg-slate-800/50' : 'text-slate-400'}`}
         >
           <LayoutDashboard className="w-4 h-4" /> Editor
         </button>
         <button 
           onClick={() => setMobileView('preview')} 
-          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'preview' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-slate-500'}`}
+          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'preview' ? 'text-indigo-400 border-b-2 border-indigo-400 bg-slate-800/50' : 'text-slate-400'}`}
         >
           <Eye className="w-4 h-4" /> Live Preview
         </button>
       </div>
 
-      {/* EDITOR PANE */}
-      <div className={`${mobileView === 'editor' ? 'block' : 'hidden'} md:block w-full md:w-3/5 p-4 md:p-8 overflow-y-auto border-r border-slate-200 h-full`}>
+      {/* EDITOR PANE (LEFT) - LIGHT GRAY/WHITE BACKGROUND (#F3F4F6) */}
+      <div className={`${mobileView === 'editor' ? 'block' : 'hidden'} md:block w-full md:w-3/5 p-4 md:p-8 overflow-y-auto border-r border-slate-700 h-full bg-[#F3F4F6]`}>
         <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm mb-6">
           <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <div className="bg-blue-100 p-1.5 rounded-lg"><User className="w-4 h-4 text-blue-600" /></div>
+            <div className="bg-indigo-100 p-1.5 rounded-lg"><User className="w-4 h-4 text-indigo-600" /></div>
             Patient Details
           </h3>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 md:col-span-7">
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Full Name</label>
-              <input type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Enter patient name" value={patient.name} onChange={e => setPatient({...patient, name: e.target.value})} />
+              <input type="text" className="w-full px-4 py-3 input-modern rounded-xl outline-none transition-all" placeholder="Enter patient name" value={patient.name} onChange={e => setPatient({...patient, name: e.target.value})} />
             </div>
             <div className="col-span-6 md:col-span-2">
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Age</label>
               <input 
                 type="number" 
                 min="1"
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" 
+                className="w-full px-4 py-3 input-modern rounded-xl outline-none transition-all" 
                 placeholder="00" 
                 value={patient.age} 
                 onChange={e => {
@@ -799,7 +856,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
             </div>
             <div className="col-span-6 md:col-span-3">
               <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Sex</label>
-              <select className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all" value={patient.sex} onChange={e => setPatient({...patient, sex: e.target.value})}>
+              <select className="w-full px-4 py-3 input-modern rounded-xl outline-none transition-all" value={patient.sex} onChange={e => setPatient({...patient, sex: e.target.value})}>
                 <option>Male</option>
                 <option>Female</option>
               </select>
@@ -813,31 +870,31 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
               <div className="bg-emerald-100 p-1.5 rounded-lg"><Pill className="w-4 h-4 text-emerald-600" /></div>
               Prescribe Medicine
             </h3>
-            <button onClick={() => setIsCustomModalOpen(true)} className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+            <button onClick={() => setIsCustomModalOpen(true)} className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
               <Plus className="w-3 h-3" /> Custom Item
             </button>
           </div>
 
-          <div className="bg-slate-50 p-4 md:p-5 rounded-xl border border-slate-200 mb-6 relative group focus-within:border-blue-300 focus-within:shadow-md transition-all">
+          <div className="bg-slate-50/50 p-4 md:p-5 rounded-xl border border-slate-200 mb-6 relative group focus-within:border-indigo-300 focus-within:shadow-md transition-all">
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 md:col-span-8 relative">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Medicine Name</label>
                 <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                  <input type="text" className="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Search database..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setIsDropdownOpen(true); if (!e.target.value) setSelectedMed(null); }} onFocus={() => setIsDropdownOpen(true)} />
+                  <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                  <input type="text" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" placeholder="Search database..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setIsDropdownOpen(true); if (!e.target.value) setSelectedMed(null); }} onFocus={() => setIsDropdownOpen(true)} />
                 </div>
                 {isDropdownOpen && searchQuery && !selectedMed && (
-                  <div className="absolute z-50 w-full bg-white mt-1 border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                  <div className="absolute z-50 w-full bg-white mt-2 border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     {filteredMeds.length === 0 ? (
-                      <div onClick={() => setIsCustomModalOpen(true)} className="p-3 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer font-medium flex items-center gap-2">
+                      <div onClick={() => setIsCustomModalOpen(true)} className="p-4 text-sm text-indigo-600 hover:bg-indigo-50 cursor-pointer font-medium flex items-center gap-2">
                         <Plus className="w-4 h-4" /> Add "{searchQuery}" as custom medicine
                       </div>
                     ) : (
                       filteredMeds.map(med => (
-                        <div key={med.id} onClick={() => handleSelectMed(med)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0">
+                        <div key={med.id} onClick={() => handleSelectMed(med)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors">
                           <div className="font-medium text-sm text-slate-900">{med.name}</div>
-                          <div className="text-xs text-slate-500 flex justify-between">
-                            <span>{med.dosage}</span>
+                          <div className="text-xs text-slate-500 flex justify-between mt-1">
+                            <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600">{med.dosage}</span>
                             <span className="font-bold text-emerald-600">₱{med.price.toFixed(2)}</span>
                           </div>
                         </div>
@@ -849,22 +906,22 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
 
               <div className="col-span-6 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Quantity</label>
-                <input type="number" min="1" className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={tempQty} onChange={e => setTempQty(e.target.value)} />
+                <input type="number" min="1" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={tempQty} onChange={e => setTempQty(e.target.value)} />
               </div>
               <div className="col-span-6 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Dosage</label>
-                <input type="text" className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="e.g. 500mg" value={tempDosage} onChange={e => setTempDosage(e.target.value)} disabled={!selectedMed} />
+                <input type="text" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" placeholder="e.g. 500mg" value={tempDosage} onChange={e => setTempDosage(e.target.value)} disabled={!selectedMed} />
               </div>
               <div className="col-span-6 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Unit Price (₱)</label>
-                <input type="number" min="0" step="0.25" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={tempPrice} onChange={e => setTempPrice(e.target.value)} disabled={!selectedMed} />
+                <input type="number" min="0" step="0.25" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={tempPrice} onChange={e => setTempPrice(e.target.value)} disabled={!selectedMed} />
               </div>
               <div className="col-span-12 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Instructions</label>
-                <input type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="e.g. 1 tab after meals" value={tempInstr} onChange={e => setTempInstr(e.target.value)} />
+                <input type="text" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" placeholder="e.g. 1 tab after meals" value={tempInstr} onChange={e => setTempInstr(e.target.value)} />
               </div>
               <div className="col-span-12">
-                <button onClick={addItem} disabled={!selectedMed} className={`w-full py-3 rounded-xl text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 ${selectedMed ? 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg transform active:scale-95' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+                <button onClick={addItem} disabled={!selectedMed} className={`w-full py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 transform active:scale-[0.98] ${selectedMed ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:shadow-slate-500/20' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}>
                   <Plus className="w-4 h-4" /> Add to List
                 </button>
               </div>
@@ -873,32 +930,32 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
 
           <div className="space-y-3 pb-8">
             {items.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-                <div className="mb-2">No medicines added yet.</div>
-                <div className="text-xs">Search above to begin.</div>
+              <div className="text-center py-16 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+                <div className="mb-2 font-medium">No medicines added yet</div>
+                <div className="text-xs opacity-70">Search above to begin building the prescription</div>
               </div>
             ) : (
               items.map((item, index) => (
-                <div key={item.uniqueId} className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors group">
+                <div key={item.uniqueId} className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all group">
                   <div className="flex items-center gap-4">
-                    <div className="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center font-bold text-slate-500 text-sm border border-slate-200 shrink-0">
+                    <div className="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center font-bold text-slate-500 text-sm border border-slate-200 shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                       {index + 1}
                     </div>
                     <div className="min-w-0">
                       <div className="font-bold text-slate-800 truncate">{item.name}</div>
-                      <div className="text-sm text-slate-500 flex gap-2 items-center flex-wrap">
-                        <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs border border-blue-100">{item.dosage}</span>
-                        <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-xs border border-emerald-100">₱{item.price.toFixed(2)}</span>
+                      <div className="text-sm text-slate-500 flex gap-2 items-center flex-wrap mt-0.5">
+                        <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border border-blue-100">{item.dosage}</span>
+                        <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border border-emerald-100">₱{item.price.toFixed(2)}</span>
                       </div>
-                      <div className="text-xs text-slate-400 italic mt-1 truncate">{item.instructions}</div>
+                      <div className="text-xs text-slate-400 italic mt-1 truncate max-w-[200px]">{item.instructions}</div>
                     </div>
                   </div>
                   <div className="text-right flex items-center gap-4 shrink-0">
                     <div>
-                      <div className="text-xs font-bold text-slate-400 uppercase">Qty: {item.quantity}</div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Qty: {item.quantity}</div>
                       <div className="font-bold text-slate-900 text-lg">₱{item.totalPrice.toFixed(2)}</div>
                     </div>
-                    <button onClick={() => removeItem(item.uniqueId)} className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                    <button onClick={() => removeItem(item.uniqueId)} className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
@@ -909,41 +966,45 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
         </div>
       </div>
 
-      {/* PREVIEW PANE */}
-      <div className={`${mobileView === 'preview' ? 'flex' : 'hidden'} md:flex flex-col no-print w-full md:w-2/5 md:bg-slate-50 md:border-l border-slate-200 h-full`}>
-        <div className="p-4 md:p-6 border-b border-slate-200 bg-white">
-          <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-            <FileText className="w-5 h-5 text-blue-600" /> Live Preview
+      {/* PREVIEW PANE (RIGHT) - DARK NAVY BACKGROUND (#0B0F19) */}
+      <div className={`${mobileView === 'preview' ? 'flex' : 'hidden'} md:flex flex-col no-print w-full md:w-2/5 md:bg-[#0B0F19] md:border-l border-slate-700 h-full`}>
+        <div className="p-4 md:p-6 border-b border-slate-700 bg-[#0B0F19]">
+          <h3 className="font-bold text-white text-lg flex items-center gap-2">
+            <FileText className="w-5 h-5 text-indigo-400" /> Live Preview
           </h3>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-100 flex justify-center">
-          <div className="bg-white w-full max-w-md shadow-xl border border-slate-200 p-6 md:p-8 min-h-[600px] text-sm relative">
-            <div className="border-b-2 border-slate-800 pb-4 mb-6">
-              <h1 className="text-lg md:text-xl font-bold uppercase tracking-wide text-slate-900">{user?.clinicDetails?.name || 'Clinic Name'}</h1>
-              <p className="text-xs text-slate-600 whitespace-pre-line">{user?.clinicDetails?.address || 'Clinic Address'}</p>
-              <div className="flex justify-between items-end mt-4">
-                <div className="text-xs">
-                  <p><span className="font-bold">Patient:</span> {patient.name || '___________'}</p>
-                  <p><span className="font-bold">Age/Sex:</span> {patient.age || '__'} / {patient.sex}</p>
-                  <p><span className="font-bold">Date:</span> {new Date().toLocaleDateString()}</p>
+        {/* CHANGED BG TO #0B0F19 TO SHOW PAPER CONTRAST */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#0B0F19] flex justify-center">
+          <div className="bg-white w-full max-w-md shadow-2xl border border-slate-200 p-6 md:p-10 min-h-[600px] text-sm relative transition-all duration-500 ease-in-out transform hover:scale-[1.01] ring-1 ring-black/5">
+            {/* Paper texture effect */}
+            <div className="absolute inset-0 bg-white opacity-50 pointer-events-none mix-blend-multiply"></div>
+
+            <div className="border-b-2 border-slate-900 pb-6 mb-8 relative z-10">
+              <h1 className="text-xl md:text-2xl font-serif font-bold uppercase tracking-widest text-slate-900">{user?.clinicDetails?.name || 'Clinic Name'}</h1>
+              <p className="text-xs text-slate-600 whitespace-pre-line mt-2 font-serif">{user?.clinicDetails?.address || 'Clinic Address'}</p>
+              <div className="flex justify-between items-end mt-6 pt-4 border-t border-slate-100">
+                <div className="text-xs space-y-1 font-serif">
+                  <p><span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Patient:</span> <span className="text-base font-semibold">{patient.name || '___________'}</span></p>
+                  <p><span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Age/Sex:</span> {patient.age || '__'} / {patient.sex}</p>
+                  <p><span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Date:</span> {new Date().toLocaleDateString()}</p>
                 </div>
               </div>
             </div>
 
-            <div className="font-serif">
-              <div className="text-4xl font-bold text-slate-300 mb-4">Rx</div>
-              <div className="space-y-4">
+            <div className="font-serif relative z-10">
+              <div className="text-5xl font-bold text-slate-200 mb-6 italic font-serif">Rx</div>
+              <div className="space-y-6">
                 {items.length === 0 ? (
-                  <p className="text-slate-300 italic text-center py-10">List is empty...</p>
+                  <p className="text-slate-300 italic text-center py-20">List is empty...</p>
                 ) : (
                   items.map((item, idx) => (
-                    <div key={item.uniqueId} className="border-b border-slate-100 pb-2 mb-2 last:border-0">
-                      <div className="flex justify-between font-bold text-slate-900">
-                        <span>{item.name} <span className="text-xs font-normal text-slate-500">{item.dosage}</span></span>
+                    <div key={item.uniqueId} className="border-b border-slate-100 pb-3 mb-2 last:border-0">
+                      <div className="flex justify-between font-bold text-slate-900 text-lg">
+                        <span>{item.name} <span className="text-sm font-normal text-slate-500 ml-2">{item.dosage}</span></span>
                         <span>#{item.quantity}</span>
                       </div>
-                      <div className="text-xs italic text-slate-600 pl-4 mt-1">
+                      <div className="text-sm italic text-slate-600 pl-4 mt-1">
                         Sig: {item.instructions}
                       </div>
                     </div>
@@ -952,34 +1013,34 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
               </div>
             </div>
 
-            <div className="absolute bottom-8 left-8 right-8 border-t border-slate-300 pt-4 flex justify-between items-end">
-              <div className="text-[10px] text-slate-400 font-sans w-1/2">
+            <div className="absolute bottom-8 left-8 right-8 border-t border-slate-900 pt-4 flex justify-between items-end z-10">
+              <div className="text-[9px] text-slate-400 font-sans w-1/2 leading-tight">
                 <p>This prescription is digitally verified. Valid for dispensing at any MediVend Kiosk or licensed pharmacy.</p>
               </div>
-              <div className="text-center w-64">
-                  <div className="h-px bg-slate-900 w-full mb-2"></div>
-                  <p className="font-bold uppercase text-slate-900">{user?.name}</p>
-                  <div className="text-[10px] uppercase text-slate-500">Lic No: {user?.license}</div>
+              <div className="text-center w-40">
+                  <div className="h-0.5 bg-slate-900 w-full mb-2"></div>
+                  <p className="font-bold uppercase text-slate-900 text-xs tracking-wide">{user?.name}</p>
+                  <div className="text-[9px] uppercase text-slate-500 font-bold tracking-widest">Lic No: {user?.license}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="p-4 md:p-6 bg-white border-t border-slate-200 pb-24 md:pb-6">
+        <div className="p-4 md:p-6 bg-[#0B0F19] border-t border-slate-700 pb-24 md:pb-6 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)]">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-slate-500 font-medium">Total Estimated Cost</span>
-            <span className="text-2xl font-bold text-blue-600">
+            <span className="text-slate-400 font-medium text-sm uppercase tracking-wide">Total Estimated Cost</span>
+            <span className="text-3xl font-bold text-white tracking-tight">
               ₱{items.reduce((sum, i) => sum + i.totalPrice, 0).toFixed(2)}
             </span>
           </div>
-          <button onClick={handleGenerate} disabled={items.length === 0 || !patient.name} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 md:py-4 rounded-xl shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 text-lg">
+          <button onClick={handleGenerate} disabled={items.length === 0 || !patient.name} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 text-lg active:scale-[0.98]">
             <Printer className="w-6 h-6" /> Generate Prescription
           </button>
         </div>
       </div>
 
       {isCustomModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
           <CustomMedicineForm onClose={() => setIsCustomModalOpen(false)} onAdd={handleAddCustomMedicineLocal} initialName={searchQuery} />
         </div>
       )}
@@ -987,7 +1048,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
   );
 }
 
-// --- 4. PRESCRIPTION VIEW ---
+// --- 4. PRESCRIPTION VIEW COMPONENT (Restored) ---
 function PrescriptionView({ data, doctor, onBack }) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qrValue)}`;
 
@@ -995,12 +1056,12 @@ function PrescriptionView({ data, doctor, onBack }) {
     <div className="flex flex-col h-full bg-slate-100 overflow-hidden print:bg-white print:overflow-visible">
       {/* TOOLBAR HIDDEN ON PRINT */}
       <div className="no-print bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex justify-between items-center shadow-sm shrink-0">
-        <button onClick={onBack} className="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2">
+        <button onClick={onBack} className="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 transition-colors">
           <LayoutDashboard className="w-4 h-4" /> <span className="hidden md:inline">Back to Editor</span> <span className="md:hidden">Back</span>
         </button>
         <div className="flex items-center gap-3">
           <div className="text-xs md:text-sm text-slate-500 mr-2 md:mr-4 hidden sm:block">ID: <span className="font-mono font-bold text-slate-800">{data.id}</span></div>
-          <button onClick={() => window.print()} className="bg-slate-900 hover:bg-slate-800 text-white px-4 md:px-5 py-2 md:py-2.5 rounded-lg flex items-center gap-2 font-bold shadow-md transition-all active:scale-95 text-sm md:text-base">
+          <button onClick={() => window.print()} className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-slate-900/20 transition-all active:scale-95 text-sm md:text-base">
             <Printer className="w-4 h-4" /> Print
           </button>
         </div>
@@ -1089,14 +1150,14 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
   const [searchTerm, setSearchQuery] = useState('');
   const filtered = medicines.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
-    <div className="p-4 md:p-8 h-full overflow-y-auto">
+    <div className="p-4 md:p-8 h-full overflow-y-auto bg-[#F3F4F6]">
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-auto">
-             <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-             <input type="text" className="w-full sm:w-64 pl-9 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-64 bg-white" placeholder="Search inventory..." value={searchTerm} onChange={(e) => setSearchQuery(e.target.value)} />
+             <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+             <input type="text" className="w-full sm:w-64 pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm placeholder-slate-400" placeholder="Search inventory..." value={searchTerm} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
-          <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all active:scale-95">
+          <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all active:scale-95">
             <Plus className="w-5 h-5" /> Add Medicine
           </button>
         </div>
@@ -1119,11 +1180,11 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
                   <tr key={med.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-6 py-4 font-bold text-slate-800">{med.name}</td>
                     <td className="px-6 py-4 text-sm text-slate-600">
-                      <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs border border-blue-100 font-medium">{med.dosage}</span>
+                      <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded text-xs border border-indigo-100 font-medium">{med.dosage}</span>
                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-emerald-600">₱{med.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right">
-                        <button onClick={() => onDelete(med.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                        <button onClick={() => onDelete(med.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete">
                           <Trash2 className="w-4 h-4" />
                         </button>
                     </td>
@@ -1139,17 +1200,17 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
                <div className="p-8 text-center text-slate-400">No medicines found.</div>
             ) : (
                filtered.map(med => (
-                 <div key={med.id} className="p-4 flex flex-col gap-3">
+                 <div key={med.id} className="p-4 flex flex-col gap-3 hover:bg-slate-50 transition-colors">
                     <div className="flex justify-between items-start">
                        <div>
                           <div className="font-bold text-slate-800 text-lg">{med.name}</div>
-                          <div className="text-sm text-slate-500 mt-1 inline-block bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100 font-medium">{med.dosage}</div>
+                          <div className="text-sm text-slate-500 mt-2 inline-block bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100 font-medium">{med.dosage}</div>
                        </div>
                        <div className="text-lg font-bold text-emerald-600">₱{med.price.toFixed(2)}</div>
                     </div>
                     <button 
                       onClick={() => onDelete(med.id)} 
-                      className="mt-1 w-full flex items-center justify-center gap-2 text-red-600 bg-red-50 py-3 rounded-xl font-bold active:scale-95 transition-all hover:bg-red-100"
+                      className="mt-2 w-full flex items-center justify-center gap-2 text-rose-600 bg-rose-50 py-3 rounded-xl font-bold active:scale-95 transition-all hover:bg-rose-100 border border-rose-100"
                     >
                        <Trash2 className="w-4 h-4" /> Remove Item
                     </button>
@@ -1160,7 +1221,7 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
         </div>
       </div>
       {isModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
           <CustomMedicineForm onClose={() => setIsModalOpen(false)} onAdd={(med) => { onAdd(med); setIsModalOpen(false); }} />
         </div>
       )}
@@ -1189,7 +1250,7 @@ function HistoryView({ user }) {
     fetchHistory();
   }, [user.email]);
   return (
-    <div className="p-4 md:p-8 h-full overflow-y-auto">
+    <div className="p-4 md:p-8 h-full overflow-y-auto bg-[#F3F4F6]">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-100 flex justify-between items-center text-sm font-bold text-slate-800 uppercase tracking-widest">Recent Activity</div>
         <table className="w-full text-left text-sm">
@@ -1212,6 +1273,7 @@ function HistoryView({ user }) {
 }
 
 function SettingsView({ user, onUpdateUser }) {
+  // ... (Keeping exact same logic from previous turn for settings, just updating styles if needed)
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -1297,7 +1359,7 @@ function SettingsView({ user, onUpdateUser }) {
   };
 
   return (
-    <div className="p-4 md:p-8 h-full overflow-y-auto bg-slate-50/50">
+    <div className="p-4 md:p-8 h-full overflow-y-auto bg-[#F3F4F6]">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
@@ -1308,19 +1370,19 @@ function SettingsView({ user, onUpdateUser }) {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar">
            <button 
              onClick={() => setActiveTab('profile')}
-             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'profile' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
            >
              <User className="w-4 h-4" /> My Profile
            </button>
            <button 
              onClick={() => setActiveTab('clinic')}
-             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'clinic' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'clinic' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
            >
              <Building className="w-4 h-4" /> Clinic Details
            </button>
            <button 
              onClick={() => setActiveTab('security')}
-             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'security' ? 'bg-slate-800 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'security' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
            >
              <Lock className="w-4 h-4" /> Security
            </button>
@@ -1338,7 +1400,7 @@ function SettingsView({ user, onUpdateUser }) {
            {activeTab === 'profile' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
-                   <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl font-bold">
+                   <div className="w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl font-bold">
                       {profileData.name.charAt(0)}
                    </div>
                    <div>
@@ -1350,27 +1412,27 @@ function SettingsView({ user, onUpdateUser }) {
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Full Name</label>
                       <div className="relative">
-                        <User className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} placeholder="Dr. Full Name" />
+                        <User className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} placeholder="Dr. Full Name" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Email Address</label>
                       <div className="relative opacity-60 cursor-not-allowed">
-                        <Mail className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input disabled className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50" value={profileData.email} />
+                        <Mail className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input disabled className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner" value={profileData.email} />
                       </div>
                    </div>
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">License Number</label>
                       <div className="relative">
-                        <FileBadge className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={profileData.license} onChange={e => setProfileData({...profileData, license: e.target.value})} placeholder="PRC-XXXXXX" />
+                        <FileBadge className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={profileData.license} onChange={e => setProfileData({...profileData, license: e.target.value})} placeholder="PRC-XXXXXX" />
                       </div>
                    </div>
                 </div>
                 <div className="pt-4 flex justify-end">
-                   <button onClick={handleSaveProfile} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/20 disabled:opacity-70 transition-all active:scale-95">
+                   <button onClick={handleSaveProfile} disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-600/20 disabled:opacity-70 transition-all active:scale-95">
                       {isLoading ? 'Saving...' : 'Save Profile'}
                    </button>
                 </div>
@@ -1388,41 +1450,41 @@ function SettingsView({ user, onUpdateUser }) {
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Clinic / Hospital Name</label>
                       <div className="relative">
-                        <Building className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={clinicData.name} onChange={e => setClinicData({...clinicData, name: e.target.value})} placeholder="e.g. St. Luke's Medical Center" />
+                        <Building className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.name} onChange={e => setClinicData({...clinicData, name: e.target.value})} placeholder="e.g. St. Luke's Medical Center" />
                       </div>
                    </div>
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Full Address</label>
                       <div className="relative">
-                        <MapPin className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={clinicData.address} onChange={e => setClinicData({...clinicData, address: e.target.value})} placeholder="Unit, Building, Street, City" />
+                        <MapPin className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.address} onChange={e => setClinicData({...clinicData, address: e.target.value})} placeholder="Unit, Building, Street, City" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Contact Number</label>
                       <div className="relative">
-                        <Phone className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={clinicData.contactNumber} onChange={e => setClinicData({...clinicData, contactNumber: e.target.value})} placeholder="(02) 8-7000" />
+                        <Phone className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.contactNumber} onChange={e => setClinicData({...clinicData, contactNumber: e.target.value})} placeholder="(02) 8-7000" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">PTR Number</label>
                       <div className="relative">
-                        <FileText className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={clinicData.ptr} onChange={e => setClinicData({...clinicData, ptr: e.target.value})} placeholder="PTR-XXXXXX" />
+                        <FileText className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.ptr} onChange={e => setClinicData({...clinicData, ptr: e.target.value})} placeholder="PTR-XXXXXX" />
                       </div>
                    </div>
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">S2 License (Optional)</label>
                       <div className="relative">
-                        <ShieldCheck className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={clinicData.s2} onChange={e => setClinicData({...clinicData, s2: e.target.value})} placeholder="S2-XXXXXX" />
+                        <ShieldCheck className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.s2} onChange={e => setClinicData({...clinicData, s2: e.target.value})} placeholder="S2-XXXXXX" />
                       </div>
                    </div>
                 </div>
                 <div className="pt-4 flex justify-end">
-                   <button onClick={handleSaveClinic} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/20 disabled:opacity-70 transition-all active:scale-95">
+                   <button onClick={handleSaveClinic} disabled={isLoading} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-600/20 disabled:opacity-70 transition-all active:scale-95">
                       {isLoading ? 'Saving...' : 'Update Clinic'}
                    </button>
                 </div>
@@ -1440,22 +1502,22 @@ function SettingsView({ user, onUpdateUser }) {
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Current Password</label>
                       <div className="relative">
-                        <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input type="password" className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={passwordData.current} onChange={e => setPasswordData({...passwordData, current: e.target.value})} placeholder="••••••••" />
+                        <Lock className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input type="password" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={passwordData.current} onChange={e => setPasswordData({...passwordData, current: e.target.value})} placeholder="••••••••" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">New Password</label>
                       <div className="relative">
-                        <Key className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input type="password" className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={passwordData.new} onChange={e => setPasswordData({...passwordData, new: e.target.value})} placeholder="New secure password" />
+                        <Key className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input type="password" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={passwordData.new} onChange={e => setPasswordData({...passwordData, new: e.target.value})} placeholder="New secure password" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Confirm New Password</label>
                       <div className="relative">
-                        <CheckCircle2 className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-                        <input type="password" className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" value={passwordData.confirm} onChange={e => setPasswordData({...passwordData, confirm: e.target.value})} placeholder="Repeat new password" />
+                        <CheckCircle2 className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                        <input type="password" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={passwordData.confirm} onChange={e => setPasswordData({...passwordData, confirm: e.target.value})} placeholder="Repeat new password" />
                       </div>
                    </div>
                    <div className="pt-2">
@@ -1474,10 +1536,13 @@ function SettingsView({ user, onUpdateUser }) {
 
 function NavButton({ active, onClick, icon, label }) {
   return (
-    <button onClick={onClick} className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${active ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
-      {React.cloneElement(icon, { className: "w-5 h-5" })}
+    <button onClick={onClick} className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${active ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+      {/* Active Indicator Bar */}
+      {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-r-full shadow-[0_0_10px_2px_rgba(99,102,241,0.5)]"></div>}
+      
+      {React.cloneElement(icon, { className: `w-5 h-5 transition-colors ${active ? 'text-indigo-400' : 'group-hover:text-white'}` })}
       <span className="font-bold text-xs uppercase tracking-widest">{label}</span>
-      {active && <ChevronRight className="w-4 h-4 ml-auto opacity-50" />}
+      {active && <ChevronRight className="w-4 h-4 ml-auto opacity-50 text-indigo-400" />}
     </button>
   );
 }
@@ -1486,9 +1551,10 @@ function NavButtonMobile({ active, onClick, icon, label }) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-200 ${active ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+      className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative ${active ? 'text-indigo-400 -translate-y-1' : 'text-slate-400 hover:text-slate-300'}`}
     >
-      {React.cloneElement(icon, { className: "w-6 h-6" })}
+      {active && <div className="absolute -top-2 w-8 h-1 bg-indigo-500 rounded-full shadow-[0_2px_8px_rgba(99,102,241,0.4)]"></div>}
+      {React.cloneElement(icon, { className: `w-6 h-6 ${active ? 'fill-current opacity-20' : ''}` })}
       <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
     </button>
   );
@@ -1516,14 +1582,25 @@ function CustomMedicineForm({ onClose, onAdd, initialName }) {
   const [formData, setFormData] = useState({ name: initialName || '', dosage: '', price: '' });
   const handleSubmit = (e) => { e.preventDefault(); if (formData.name) onAdd(formData); };
   return (
-    <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl border border-slate-100">
-      <h3 className="font-bold mb-4 uppercase tracking-widest text-sm">Add Custom Item</h3>
+    <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+      <h3 className="font-bold mb-4 uppercase tracking-widest text-sm text-slate-500">Add Custom Item</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input required className="w-full p-3 border rounded-xl" placeholder="Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-        <input required className="w-full p-3 border rounded-xl" placeholder="Dosage" value={formData.dosage} onChange={e => setFormData({...formData, dosage: e.target.value})} />
-        <input required type="number" className="w-full p-3 border rounded-xl" placeholder="Price" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
-        <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Add & Select</button>
-        <button onClick={onClose} type="button" className="w-full text-slate-400">Cancel</button>
+        <div>
+           <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Medicine Name</label>
+           <input required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" placeholder="Enter name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+        </div>
+        <div>
+           <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Dosage</label>
+           <input required className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" placeholder="e.g. 500mg Tab" value={formData.dosage} onChange={e => setFormData({...formData, dosage: e.target.value})} />
+        </div>
+        <div>
+           <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Unit Price (₱)</label>
+           <input required type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all" placeholder="0.00" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+        </div>
+        <div className="flex gap-3 pt-2">
+           <button type="button" onClick={onClose} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl transition-colors">Cancel</button>
+           <button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-600/20 transition-all active:scale-95">Add Item</button>
+        </div>
       </form>
     </div>
   );
