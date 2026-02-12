@@ -32,7 +32,9 @@ import {
   ArrowRight,
   Sparkles,
   Award,
-  HelpCircle
+  HelpCircle,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { initializeApp } from "firebase/app";
 import { 
@@ -87,6 +89,7 @@ export default function App() {
   const [user, setUser] = useState(null); 
   const [currentPrescription, setCurrentPrescription] = useState(null);
   const [medicineList, setMedicineList] = useState(DEFAULT_MEDICINES);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     signInAnonymously(auth).catch((err) => console.error("Auth failed:", err));
@@ -206,18 +209,19 @@ export default function App() {
   };
 
   return (
-    <div className="h-[100dvh] bg-[#F3F4F6] font-sans text-slate-800 overflow-hidden flex flex-col">
+    <div className={`h-[100dvh] font-sans overflow-hidden flex flex-col ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-800'}`}>
       {/* PRINT ENGINE & GLOBAL STYLES */}
       <style>
         {`
           /* Modern Input Field Style */
           .input-modern {
-             background-color: #f9fafb;
-             border: 1px solid #e5e7eb;
+             background-color: ${isDarkMode ? '#1e293b' : '#f9fafb'};
+             border: 1px solid ${isDarkMode ? '#334155' : '#e5e7eb'};
+             color: ${isDarkMode ? '#f1f5f9' : '#1e293b'};
              transition: all 0.2s ease;
           }
           .input-modern:focus {
-             background-color: white;
+             background-color: ${isDarkMode ? '#0f172a' : 'white'};
              border-color: #6366f1; /* Indigo-500 */
              box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
           }
@@ -301,63 +305,70 @@ export default function App() {
       {currentView === 'onboarding' && <OnboardingScreen onComplete={handleOnboardingComplete} user={user} />}
       
       {['dashboard', 'prescription', 'history', 'settings', 'medicines'].includes(currentView) && (
-        <div className="flex h-full overflow-hidden bg-[#0B0F19] print:bg-white print:block">
-          {/* DESKTOP SIDEBAR - Deep Navy (#0B0F19) */}
-          <aside className="no-print w-72 bg-[#0B0F19] text-slate-300 flex-col hidden md:flex border-r border-white/5 shadow-2xl z-30 relative overflow-hidden">
+        <div className={`flex h-full overflow-hidden print:bg-white print:block ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-white'}`}>
+          {/* DESKTOP SIDEBAR */}
+          <aside className={`no-print w-72 flex-col hidden md:flex border-r shadow-2xl z-30 relative overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-[#0B0F19] text-slate-300 border-white/5' : 'bg-white text-slate-600 border-slate-200'}`}>
               
-             <div className="relative z-10 p-6 flex items-center gap-3 border-b border-white/5">
+             <div className={`relative z-10 p-6 flex items-center gap-3 border-b ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
               <div className="bg-gradient-to-tr from-indigo-500 to-blue-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20 ring-1 ring-white/10">
                 <Stethoscope className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-white text-lg tracking-wide">MediVend</h1>
-                <p className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider">Doctor Portal</p>
+                <h1 className={`font-bold text-lg tracking-wide ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>MediVend</h1>
+                <p className="text-[10px] uppercase font-bold text-indigo-500 tracking-wider">Doctor Portal</p>
               </div>
             </div>
             
             <nav className="relative z-10 flex-1 p-4 space-y-2 overflow-y-auto">
-              <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-500/80">Clinical Workspace</div>
-              <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="New Prescription" />
-              <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" />
+              <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Clinical Workspace</div>
+              <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="New Prescription" isDarkMode={isDarkMode} />
+              <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" isDarkMode={isDarkMode} />
               
-              <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-500/80">Management</div>
-               <NavButton active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill className="w-5 h-5" />} label="Medicine List" />
+              <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Management</div>
+               <NavButton active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill className="w-5 h-5" />} label="Medicine List" isDarkMode={isDarkMode} />
 
-              <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-500/80">System</div>
-              <NavButton active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings className="w-5 h-5" />} label="Account Settings" />
+              <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">System</div>
+              <NavButton active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings className="w-5 h-5" />} label="Account Settings" isDarkMode={isDarkMode} />
             </nav>
 
-            <div className="relative z-10 p-4 bg-[#05080F] border-t border-white/5">
-              <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
+            <div className={`relative z-10 p-4 border-t ${isDarkMode ? 'bg-[#05080F] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
+              <div className={`flex items-center gap-3 mb-4 p-3 rounded-xl border transition-colors ${isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
                 <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                   {user?.name?.charAt(0) || 'D'}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-                  <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                  <p className={`text-sm font-semibold truncate ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{user?.name}</p>
+                  <p className="text-xs opacity-70 truncate">{user?.email}</p>
                 </div>
               </div>
-              <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 transition-all text-sm font-medium group">
+              <button onClick={handleLogout} className="flex w-full items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-rose-500/10 hover:text-rose-500 transition-all text-sm font-medium group">
                 <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Sign Out
               </button>
             </div>
           </aside>
 
-          {/* MAIN CONTENT AREA - DEEP NAVY BG for layout */}
-          <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative print:block bg-[#0B0F19]">
-            <header className="no-print bg-[#0B0F19] border-b border-white/5 flex items-center justify-between px-4 md:px-8 shadow-md z-20 shrink-0 sticky top-0">
+          {/* MAIN CONTENT AREA */}
+          <div className={`flex-1 flex flex-col min-w-0 overflow-hidden relative print:block ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-white'}`}>
+            <header className={`no-print border-b flex items-center justify-between px-4 md:px-8 shadow-md z-20 shrink-0 sticky top-0 transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/5' : 'bg-white border-slate-200'}`}>
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight capitalize flex items-center gap-2">
-                  {currentView === 'dashboard' ? <><LayoutDashboard className="w-5 h-5 text-indigo-400"/> New Prescription</> : 
-                   currentView === 'medicines' ? <><Pill className="w-5 h-5 text-emerald-400"/> Medicine List</> : 
-                   currentView === 'history' ? <><History className="w-5 h-5 text-indigo-400"/> Patient History</> :
-                   currentView === 'prescription' ? <><Printer className="w-5 h-5 text-indigo-400"/> Prescription Preview</> :
+                <h2 className={`text-lg md:text-xl font-bold tracking-tight capitalize flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                  {currentView === 'dashboard' ? <><LayoutDashboard className="w-5 h-5 text-indigo-500"/> New Prescription</> : 
+                   currentView === 'medicines' ? <><Pill className="w-5 h-5 text-emerald-500"/> Medicine List</> : 
+                   currentView === 'history' ? <><History className="w-5 h-5 text-indigo-500"/> Patient History</> :
+                   currentView === 'prescription' ? <><Printer className="w-5 h-5 text-indigo-500"/> Prescription Preview</> :
                    <><Settings className="w-5 h-5 text-slate-400"/> Account Settings</>}
                 </h2>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-xs md:text-sm font-medium text-slate-300 flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-                  <Clock className="w-3.5 h-3.5 text-indigo-400" /> <span className="font-semibold text-slate-200">{new Date().toLocaleDateString()}</span>
+                <button 
+                  onClick={() => setIsDarkMode(!isDarkMode)} 
+                  className={`p-2 rounded-full transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}
+                  title="Toggle Theme"
+                >
+                  {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
+                </button>
+                <div className={`text-xs md:text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                  <Clock className="w-3.5 h-3.5 text-indigo-500" /> <span className={isDarkMode ? 'text-slate-200 font-semibold' : 'text-slate-900 font-semibold'}>{new Date().toLocaleDateString()}</span>
                 </div>
               </div>
             </header>
@@ -370,17 +381,19 @@ export default function App() {
                   onGenerate={handleGenerate} 
                   medicineList={medicineList}
                   onAddCustomMedicine={handleAddMedicine}
+                  isDarkMode={isDarkMode}
                 />
               )}
-              {currentView === 'history' && <HistoryView user={user} />}
+              {currentView === 'history' && <HistoryView user={user} isDarkMode={isDarkMode} />}
               {currentView === 'medicines' && (
                 <MedicineManager 
                    medicines={medicineList} 
                    onAdd={handleAddMedicine} 
                    onDelete={handleDeleteMedicine} 
+                   isDarkMode={isDarkMode}
                 />
               )}
-              {currentView === 'settings' && <SettingsView user={user} onUpdateUser={handleUpdateUser} />}
+              {currentView === 'settings' && <SettingsView user={user} onUpdateUser={handleUpdateUser} isDarkMode={isDarkMode} />}
               {currentView === 'prescription' && (
                 <PrescriptionView 
                   data={currentPrescription} 
@@ -391,11 +404,20 @@ export default function App() {
             </main>
 
             {/* MOBILE BOTTOM NAVIGATION - HIDDEN ON PRINT */}
-            <nav className="mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 bg-[#0B0F19] border-t border-white/10 flex justify-around px-2 py-3 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.3)] pb-safe">
-              <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="New Rx" />
-              <NavButtonMobile active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History />} label="History" />
-              <NavButtonMobile active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill />} label="Meds List" />
-              <NavButtonMobile active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings />} label="Account" />
+            <nav className={`mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 border-t flex justify-around px-2 py-3 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.1)] pb-safe transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
+              <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="New Rx" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History />} label="History" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill />} label="Meds List" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings />} label="Account" isDarkMode={isDarkMode} />
+              
+              {/* ADDED LOGOUT BUTTON FOR MOBILE */}
+              <button 
+                onClick={handleLogout}
+                className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative text-slate-400 hover:text-rose-500"
+              >
+                 <LogOut className="w-6 h-6" />
+                 <span className="text-[10px] font-bold uppercase tracking-wide">Log Out</span>
+              </button>
             </nav>
           </div>
         </div>
@@ -733,7 +755,7 @@ function OnboardingScreen({ onComplete, user }) {
   );
 }
 
-function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
+function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDarkMode }) {
   const [patient, setPatient] = useState({ name: '', age: '', sex: 'Male' });
   const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -809,28 +831,28 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden relative bg-white md:bg-transparent">
+    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden relative bg-transparent">
       {/* MOBILE TABS */}
-      <div className="md:hidden no-print flex bg-[#1e293b] border-b border-slate-700 shrink-0 sticky top-0 z-30">
+      <div className={`md:hidden no-print flex border-b shrink-0 sticky top-0 z-30 ${isDarkMode ? 'bg-[#1e293b] border-slate-700' : 'bg-white border-slate-200'}`}>
         <button 
           onClick={() => setMobileView('editor')} 
-          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'editor' ? 'text-indigo-400 border-b-2 border-indigo-400 bg-slate-800/50' : 'text-slate-400'}`}
+          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'editor' ? 'text-indigo-500 border-b-2 border-indigo-500 bg-indigo-50/10' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
         >
           <LayoutDashboard className="w-4 h-4" /> Editor
         </button>
         <button 
           onClick={() => setMobileView('preview')} 
-          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'preview' ? 'text-indigo-400 border-b-2 border-indigo-400 bg-slate-800/50' : 'text-slate-400'}`}
+          className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'preview' ? 'text-indigo-500 border-b-2 border-indigo-500 bg-indigo-50/10' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
         >
           <Eye className="w-4 h-4" /> Live Preview
         </button>
       </div>
 
-      {/* EDITOR PANE (LEFT) - LIGHT GRAY/WHITE BACKGROUND (#F3F4F6) */}
-      <div className={`${mobileView === 'editor' ? 'block' : 'hidden'} md:block w-full md:w-3/5 p-4 md:p-8 overflow-y-auto border-r border-slate-700 h-full bg-[#F3F4F6]`}>
-        <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm mb-6">
-          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <div className="bg-indigo-100 p-1.5 rounded-lg"><User className="w-4 h-4 text-indigo-600" /></div>
+      {/* EDITOR PANE (LEFT) */}
+      <div className={`md:block w-full md:w-3/5 p-4 md:p-8 overflow-y-auto border-r h-full ${mobileView === 'editor' ? 'block' : 'hidden'} ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+        <div className={`p-4 md:p-6 rounded-2xl border shadow-sm mb-6 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+          <h3 className={`font-bold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+            <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-indigo-900/50' : 'bg-indigo-100'}`}><User className="w-4 h-4 text-indigo-600" /></div>
             Patient Details
           </h3>
           <div className="grid grid-cols-12 gap-4">
@@ -864,37 +886,37 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
           </div>
         </div>
 
-        <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm min-h-[400px]">
+        <div className={`p-4 md:p-6 rounded-2xl border shadow-sm min-h-[400px] ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
-              <div className="bg-emerald-100 p-1.5 rounded-lg"><Pill className="w-4 h-4 text-emerald-600" /></div>
+            <h3 className={`font-bold flex items-center gap-2 ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>
+              <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'}`}><Pill className="w-4 h-4 text-emerald-600" /></div>
               Prescribe Medicine
             </h3>
-            <button onClick={() => setIsCustomModalOpen(true)} className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+            <button onClick={() => setIsCustomModalOpen(true)} className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${isDarkMode ? 'text-indigo-400 bg-indigo-900/30 hover:bg-indigo-900/50' : 'text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100'}`}>
               <Plus className="w-3 h-3" /> Custom Item
             </button>
           </div>
 
-          <div className="bg-slate-50/50 p-4 md:p-5 rounded-xl border border-slate-200 mb-6 relative group focus-within:border-indigo-300 focus-within:shadow-md transition-all">
+          <div className={`p-4 md:p-5 rounded-xl border mb-6 relative group focus-within:border-indigo-300 focus-within:shadow-md transition-all ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50/50 border-slate-200'}`}>
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 md:col-span-8 relative">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Medicine Name</label>
                 <div className="relative">
                   <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                  <input type="text" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" placeholder="Search database..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setIsDropdownOpen(true); if (!e.target.value) setSelectedMed(null); }} onFocus={() => setIsDropdownOpen(true)} />
+                  <input type="text" className={`w-full pl-9 pr-3 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} placeholder="Search database..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setIsDropdownOpen(true); if (!e.target.value) setSelectedMed(null); }} onFocus={() => setIsDropdownOpen(true)} />
                 </div>
                 {isDropdownOpen && searchQuery && !selectedMed && (
-                  <div className="absolute z-50 w-full bg-white mt-2 border border-slate-100 rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                  <div className={`absolute z-50 w-full mt-2 border rounded-xl shadow-xl max-h-60 overflow-y-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
                     {filteredMeds.length === 0 ? (
-                      <div onClick={() => setIsCustomModalOpen(true)} className="p-4 text-sm text-indigo-600 hover:bg-indigo-50 cursor-pointer font-medium flex items-center gap-2">
+                      <div onClick={() => setIsCustomModalOpen(true)} className={`p-4 text-sm cursor-pointer font-medium flex items-center gap-2 ${isDarkMode ? 'text-indigo-400 hover:bg-slate-700' : 'text-indigo-600 hover:bg-indigo-50'}`}>
                         <Plus className="w-4 h-4" /> Add "{searchQuery}" as custom medicine
                       </div>
                     ) : (
                       filteredMeds.map(med => (
-                        <div key={med.id} onClick={() => handleSelectMed(med)} className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors">
-                          <div className="font-medium text-sm text-slate-900">{med.name}</div>
+                        <div key={med.id} onClick={() => handleSelectMed(med)} className={`p-3 cursor-pointer border-b last:border-0 transition-colors ${isDarkMode ? 'hover:bg-slate-700 border-slate-700' : 'hover:bg-slate-50 border-slate-50'}`}>
+                          <div className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{med.name}</div>
                           <div className="text-xs text-slate-500 flex justify-between mt-1">
-                            <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600">{med.dosage}</span>
+                            <span className={`px-2 py-0.5 rounded ${isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>{med.dosage}</span>
                             <span className="font-bold text-emerald-600">₱{med.price.toFixed(2)}</span>
                           </div>
                         </div>
@@ -906,19 +928,19 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
 
               <div className="col-span-6 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Quantity</label>
-                <input type="number" min="1" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={tempQty} onChange={e => setTempQty(e.target.value)} />
+                <input type="number" min="1" className={`w-full px-3 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-600 text-white' : 'bg-white border-slate-200'}`} value={tempQty} onChange={e => setTempQty(e.target.value)} />
               </div>
               <div className="col-span-6 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Dosage</label>
-                <input type="text" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" placeholder="e.g. 500mg" value={tempDosage} onChange={e => setTempDosage(e.target.value)} disabled={!selectedMed} />
+                <input type="text" className={`w-full px-3 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-600 text-white' : 'bg-white border-slate-200'}`} placeholder="e.g. 500mg" value={tempDosage} onChange={e => setTempDosage(e.target.value)} disabled={!selectedMed} />
               </div>
               <div className="col-span-6 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Unit Price (₱)</label>
-                <input type="number" min="0" step="0.25" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={tempPrice} onChange={e => setTempPrice(e.target.value)} disabled={!selectedMed} />
+                <input type="number" min="0" step="0.25" className={`w-full px-3 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-600 text-white' : 'bg-white border-slate-200'}`} value={tempPrice} onChange={e => setTempPrice(e.target.value)} disabled={!selectedMed} />
               </div>
               <div className="col-span-12 md:col-span-4">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Instructions</label>
-                <input type="text" className="w-full px-3 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" placeholder="e.g. 1 tab after meals" value={tempInstr} onChange={e => setTempInstr(e.target.value)} />
+                <input type="text" className={`w-full px-3 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-600 text-white' : 'bg-white border-slate-200'}`} placeholder="e.g. 1 tab after meals" value={tempInstr} onChange={e => setTempInstr(e.target.value)} />
               </div>
               <div className="col-span-12">
                 <button onClick={addItem} disabled={!selectedMed} className={`w-full py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 transform active:scale-[0.98] ${selectedMed ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:shadow-slate-500/20' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}>
@@ -930,22 +952,22 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
 
           <div className="space-y-3 pb-8">
             {items.length === 0 ? (
-              <div className="text-center py-16 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/30">
+              <div className={`text-center py-16 border-2 border-dashed rounded-2xl ${isDarkMode ? 'border-slate-700 bg-slate-800/50 text-slate-500' : 'border-slate-200 bg-slate-50/30 text-slate-400'}`}>
                 <div className="mb-2 font-medium">No medicines added yet</div>
                 <div className="text-xs opacity-70">Search above to begin building the prescription</div>
               </div>
             ) : (
               items.map((item, index) => (
-                <div key={item.uniqueId} className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-100 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all group">
+                <div key={item.uniqueId} className={`flex items-center justify-between p-4 rounded-xl border shadow-sm transition-all group ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-indigo-500/50' : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-md'}`}>
                   <div className="flex items-center gap-4">
-                    <div className="bg-slate-100 w-10 h-10 rounded-full flex items-center justify-center font-bold text-slate-500 text-sm border border-slate-200 shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border shrink-0 transition-colors ${isDarkMode ? 'bg-slate-700 border-slate-600 text-slate-300 group-hover:bg-indigo-900/50 group-hover:text-indigo-400' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600'}`}>
                       {index + 1}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-slate-800 truncate">{item.name}</div>
+                      <div className={`font-bold truncate ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{item.name}</div>
                       <div className="text-sm text-slate-500 flex gap-2 items-center flex-wrap mt-0.5">
-                        <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border border-blue-100">{item.dosage}</span>
-                        <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border border-emerald-100">₱{item.price.toFixed(2)}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border ${isDarkMode ? 'bg-indigo-900/30 text-indigo-300 border-indigo-900/50' : 'bg-blue-50 text-blue-700 border-blue-100'}`}>{item.dosage}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border ${isDarkMode ? 'bg-emerald-900/30 text-emerald-400 border-emerald-900/50' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>₱{item.price.toFixed(2)}</span>
                       </div>
                       <div className="text-xs text-slate-400 italic mt-1 truncate max-w-[200px]">{item.instructions}</div>
                     </div>
@@ -953,9 +975,9 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
                   <div className="text-right flex items-center gap-4 shrink-0">
                     <div>
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Qty: {item.quantity}</div>
-                      <div className="font-bold text-slate-900 text-lg">₱{item.totalPrice.toFixed(2)}</div>
+                      <div className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>₱{item.totalPrice.toFixed(2)}</div>
                     </div>
-                    <button onClick={() => removeItem(item.uniqueId)} className="p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors">
+                    <button onClick={() => removeItem(item.uniqueId)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-900/20' : 'text-slate-300 hover:text-rose-500 hover:bg-rose-50'}`}>
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
@@ -967,15 +989,15 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
       </div>
 
       {/* PREVIEW PANE (RIGHT) - DARK NAVY BACKGROUND (#0B0F19) */}
-      <div className={`${mobileView === 'preview' ? 'flex' : 'hidden'} md:flex flex-col no-print w-full md:w-2/5 md:bg-[#0B0F19] md:border-l border-slate-700 h-full`}>
-        <div className="p-4 md:p-6 border-b border-slate-700 bg-[#0B0F19]">
-          <h3 className="font-bold text-white text-lg flex items-center gap-2">
-            <FileText className="w-5 h-5 text-indigo-400" /> Live Preview
+      <div className={`md:flex flex-col no-print w-full md:w-2/5 md:border-l h-full ${mobileView === 'preview' ? 'flex' : 'hidden'} ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
+        <div className={`p-4 md:p-6 border-b ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
+          <h3 className={`font-bold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+            <FileText className="w-5 h-5 text-indigo-500" /> Live Preview
           </h3>
         </div>
         
         {/* CHANGED BG TO #0B0F19 TO SHOW PAPER CONTRAST */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#0B0F19] flex justify-center">
+        <div className={`flex-1 overflow-y-auto p-4 md:p-6 flex justify-center ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-slate-50'}`}>
           <div className="bg-white w-full max-w-md shadow-2xl border border-slate-200 p-6 md:p-10 min-h-[600px] text-sm relative transition-all duration-500 ease-in-out transform hover:scale-[1.01] ring-1 ring-black/5">
             {/* Paper texture effect */}
             <div className="absolute inset-0 bg-white opacity-50 pointer-events-none mix-blend-multiply"></div>
@@ -1026,10 +1048,10 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine }) {
           </div>
         </div>
 
-        <div className="p-4 md:p-6 bg-[#0B0F19] border-t border-slate-700 pb-24 md:pb-6 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)]">
+        <div className={`p-4 md:p-6 border-t pb-24 md:pb-6 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)] ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
           <div className="flex justify-between items-center mb-4">
             <span className="text-slate-400 font-medium text-sm uppercase tracking-wide">Total Estimated Cost</span>
-            <span className="text-3xl font-bold text-white tracking-tight">
+            <span className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               ₱{items.reduce((sum, i) => sum + i.totalPrice, 0).toFixed(2)}
             </span>
           </div>
@@ -1145,46 +1167,46 @@ function PrescriptionView({ data, doctor, onBack }) {
 
 // MedicineManager, HistoryView, NavButton, PasswordModal, CustomMedicineForm, NavButtonMobile remain as previously defined
 
-function MedicineManager({ medicines, onAdd, onDelete }) {
+function MedicineManager({ medicines, onAdd, onDelete, isDarkMode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchQuery] = useState('');
   const filtered = medicines.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
-    <div className="p-4 md:p-8 h-full overflow-y-auto bg-[#F3F4F6]">
+    <div className={`p-4 md:p-8 h-full overflow-y-auto ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
       <div className="max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-auto">
              <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-             <input type="text" className="w-full sm:w-64 pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm placeholder-slate-400" placeholder="Search inventory..." value={searchTerm} onChange={(e) => setSearchQuery(e.target.value)} />
+             <input type="text" className={`w-full sm:w-64 pl-9 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 placeholder-slate-400'}`} placeholder="Search inventory..." value={searchTerm} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
           <button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all active:scale-95">
             <Plus className="w-5 h-5" /> Add Medicine
           </button>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className={`rounded-2xl shadow-sm border overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
           {/* DESKTOP TABLE */}
           <table className="w-full text-left hidden md:table">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-bold text-slate-500 tracking-wider">
+              <tr className={`border-b text-xs uppercase font-bold tracking-wider ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
                 <th className="px-6 py-4">Medicine Name</th>
                 <th className="px-6 py-4">Dosage</th>
                 <th className="px-6 py-4">Unit Price</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className={`divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-100'}`}>
               {filtered.length === 0 ? (
                 <tr><td colSpan="4" className="p-12 text-center text-slate-400">No medicines found.</td></tr>
               ) : (
                 filtered.map(med => (
-                  <tr key={med.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-800">{med.name}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded text-xs border border-indigo-100 font-medium">{med.dosage}</span>
+                  <tr key={med.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}`}>
+                    <td className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{med.name}</td>
+                    <td className={`px-6 py-4 text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                      <span className={`px-2.5 py-1 rounded text-xs border font-medium ${isDarkMode ? 'bg-indigo-900/30 text-indigo-300 border-indigo-900/50' : 'bg-indigo-50 text-indigo-700 border-indigo-100'}`}>{med.dosage}</span>
                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-emerald-600">₱{med.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right">
-                        <button onClick={() => onDelete(med.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete">
+                        <button onClick={() => onDelete(med.id)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-900/20' : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'}`} title="Delete">
                           <Trash2 className="w-4 h-4" />
                         </button>
                     </td>
@@ -1195,22 +1217,22 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
           </table>
 
           {/* MOBILE LIST (Cards) */}
-          <div className="md:hidden divide-y divide-slate-100">
+          <div className={`md:hidden divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-100'}`}>
             {filtered.length === 0 ? (
                <div className="p-8 text-center text-slate-400">No medicines found.</div>
             ) : (
                filtered.map(med => (
-                 <div key={med.id} className="p-4 flex flex-col gap-3 hover:bg-slate-50 transition-colors">
+                 <div key={med.id} className={`p-4 flex flex-col gap-3 transition-colors ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}`}>
                     <div className="flex justify-between items-start">
                        <div>
-                          <div className="font-bold text-slate-800 text-lg">{med.name}</div>
-                          <div className="text-sm text-slate-500 mt-2 inline-block bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border border-indigo-100 font-medium">{med.dosage}</div>
+                          <div className={`font-bold text-lg ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{med.name}</div>
+                          <div className={`text-sm mt-2 inline-block px-2 py-0.5 rounded border font-medium ${isDarkMode ? 'bg-indigo-900/30 text-indigo-300 border-indigo-900/50' : 'text-slate-500 bg-indigo-50 text-indigo-700 border-indigo-100'}`}>{med.dosage}</div>
                        </div>
                        <div className="text-lg font-bold text-emerald-600">₱{med.price.toFixed(2)}</div>
                     </div>
                     <button 
                       onClick={() => onDelete(med.id)} 
-                      className="mt-2 w-full flex items-center justify-center gap-2 text-rose-600 bg-rose-50 py-3 rounded-xl font-bold active:scale-95 transition-all hover:bg-rose-100 border border-rose-100"
+                      className={`mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold active:scale-95 transition-all border ${isDarkMode ? 'text-rose-400 bg-rose-900/10 border-rose-900/30 hover:bg-rose-900/30' : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-100'}`}
                     >
                        <Trash2 className="w-4 h-4" /> Remove Item
                     </button>
@@ -1229,7 +1251,7 @@ function MedicineManager({ medicines, onAdd, onDelete }) {
   );
 }
 
-function HistoryView({ user }) {
+function HistoryView({ user, isDarkMode }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -1250,18 +1272,18 @@ function HistoryView({ user }) {
     fetchHistory();
   }, [user.email]);
   return (
-    <div className="p-4 md:p-8 h-full overflow-y-auto bg-[#F3F4F6]">
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center text-sm font-bold text-slate-800 uppercase tracking-widest">Recent Activity</div>
+    <div className={`p-4 md:p-8 h-full overflow-y-auto ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
+      <div className={`max-w-6xl mx-auto rounded-2xl shadow-sm border overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+        <div className={`p-6 border-b flex justify-between items-center text-sm font-bold uppercase tracking-widest ${isDarkMode ? 'border-slate-700 text-slate-300' : 'border-slate-100 text-slate-800'}`}>Recent Activity</div>
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+          <thead className={`border-b text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
             <tr><th className="px-6 py-4">Date Issued</th><th className="px-6 py-4">Patient Name</th><th className="px-6 py-4 text-right">Amount</th></tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className={`divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-100'}`}>
             {loading ? <tr><td colSpan="3" className="p-12 text-center text-slate-400 italic">Syncing...</td></tr> : history.map(r => (
-              <tr key={r.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4 text-slate-500">{r.date}</td>
-                <td className="px-6 py-4 font-bold text-slate-800">{r.patient.name}</td>
+              <tr key={r.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}`}>
+                <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{r.date}</td>
+                <td className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{r.patient.name}</td>
                 <td className="px-6 py-4 text-right font-bold text-emerald-600">₱{r.grandTotal.toFixed(2)}</td>
               </tr>
             ))}
@@ -1272,7 +1294,7 @@ function HistoryView({ user }) {
   );
 }
 
-function SettingsView({ user, onUpdateUser }) {
+function SettingsView({ user, onUpdateUser, isDarkMode }) {
   // ... (Keeping exact same logic from previous turn for settings, just updating styles if needed)
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);
@@ -1359,10 +1381,10 @@ function SettingsView({ user, onUpdateUser }) {
   };
 
   return (
-    <div className="p-4 md:p-8 h-full overflow-y-auto bg-[#F3F4F6]">
+    <div className={`p-4 md:p-8 h-full overflow-y-auto ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Settings</h1>
           <p className="text-slate-500">Manage your account and clinic preferences.</p>
         </div>
 
@@ -1370,26 +1392,26 @@ function SettingsView({ user, onUpdateUser }) {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar">
            <button 
              onClick={() => setActiveTab('profile')}
-             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'profile' ? 'bg-indigo-600 text-white shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
            >
              <User className="w-4 h-4" /> My Profile
            </button>
            <button 
              onClick={() => setActiveTab('clinic')}
-             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'clinic' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'clinic' ? 'bg-indigo-600 text-white shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
            >
              <Building className="w-4 h-4" /> Clinic Details
            </button>
            <button 
              onClick={() => setActiveTab('security')}
-             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'security' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
+             className={`px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${activeTab === 'security' ? 'bg-indigo-600 text-white shadow-md' : isDarkMode ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'}`}
            >
              <Lock className="w-4 h-4" /> Security
            </button>
         </div>
 
         {/* Content Area */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8 relative overflow-hidden">
+        <div className={`rounded-2xl border shadow-sm p-6 md:p-8 relative overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
            {notification && (
              <div className={`absolute top-0 left-0 right-0 p-3 text-center text-sm font-bold ${notification.type === 'error' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
                {notification.message}
@@ -1399,12 +1421,12 @@ function SettingsView({ user, onUpdateUser }) {
            {/* PROFILE TAB */}
            {activeTab === 'profile' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
-                   <div className="w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl font-bold">
+                <div className={`flex items-center gap-4 border-b pb-6 ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+                   <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${isDarkMode ? 'bg-indigo-900/50 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
                       {profileData.name.charAt(0)}
                    </div>
                    <div>
-                      <h3 className="font-bold text-slate-800 text-lg">Personal Information</h3>
+                      <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Personal Information</h3>
                       <p className="text-slate-500 text-sm">Update your public profile information.</p>
                    </div>
                 </div>
@@ -1413,21 +1435,21 @@ function SettingsView({ user, onUpdateUser }) {
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Full Name</label>
                       <div className="relative">
                         <User className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} placeholder="Dr. Full Name" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} placeholder="Dr. Full Name" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Email Address</label>
                       <div className="relative opacity-60 cursor-not-allowed">
                         <Mail className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input disabled className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl shadow-inner" value={profileData.email} />
+                        <input disabled className={`w-full pl-9 pr-3 py-3 border rounded-xl shadow-inner ${isDarkMode ? 'bg-slate-700 border-slate-600 text-slate-300' : 'bg-slate-50 border-slate-200'}`} value={profileData.email} />
                       </div>
                    </div>
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">License Number</label>
                       <div className="relative">
                         <FileBadge className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={profileData.license} onChange={e => setProfileData({...profileData, license: e.target.value})} placeholder="PRC-XXXXXX" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={profileData.license} onChange={e => setProfileData({...profileData, license: e.target.value})} placeholder="PRC-XXXXXX" />
                       </div>
                    </div>
                 </div>
@@ -1442,8 +1464,8 @@ function SettingsView({ user, onUpdateUser }) {
            {/* CLINIC TAB */}
            {activeTab === 'clinic' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="border-b border-slate-100 pb-6">
-                   <h3 className="font-bold text-slate-800 text-lg">Clinic Information</h3>
+                <div className={`border-b pb-6 ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+                   <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Clinic Information</h3>
                    <p className="text-slate-500 text-sm">This information appears on your prescription header.</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1451,35 +1473,35 @@ function SettingsView({ user, onUpdateUser }) {
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Clinic / Hospital Name</label>
                       <div className="relative">
                         <Building className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.name} onChange={e => setClinicData({...clinicData, name: e.target.value})} placeholder="e.g. St. Luke's Medical Center" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={clinicData.name} onChange={e => setClinicData({...clinicData, name: e.target.value})} placeholder="e.g. St. Luke's Medical Center" />
                       </div>
                    </div>
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Full Address</label>
                       <div className="relative">
                         <MapPin className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.address} onChange={e => setClinicData({...clinicData, address: e.target.value})} placeholder="Unit, Building, Street, City" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={clinicData.address} onChange={e => setClinicData({...clinicData, address: e.target.value})} placeholder="Unit, Building, Street, City" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Contact Number</label>
                       <div className="relative">
                         <Phone className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.contactNumber} onChange={e => setClinicData({...clinicData, contactNumber: e.target.value})} placeholder="(02) 8-7000" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={clinicData.contactNumber} onChange={e => setClinicData({...clinicData, contactNumber: e.target.value})} placeholder="(02) 8-7000" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">PTR Number</label>
                       <div className="relative">
                         <FileText className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.ptr} onChange={e => setClinicData({...clinicData, ptr: e.target.value})} placeholder="PTR-XXXXXX" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={clinicData.ptr} onChange={e => setClinicData({...clinicData, ptr: e.target.value})} placeholder="PTR-XXXXXX" />
                       </div>
                    </div>
                    <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">S2 License (Optional)</label>
                       <div className="relative">
                         <ShieldCheck className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={clinicData.s2} onChange={e => setClinicData({...clinicData, s2: e.target.value})} placeholder="S2-XXXXXX" />
+                        <input className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={clinicData.s2} onChange={e => setClinicData({...clinicData, s2: e.target.value})} placeholder="S2-XXXXXX" />
                       </div>
                    </div>
                 </div>
@@ -1494,8 +1516,8 @@ function SettingsView({ user, onUpdateUser }) {
            {/* SECURITY TAB */}
            {activeTab === 'security' && (
              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="border-b border-slate-100 pb-6">
-                   <h3 className="font-bold text-slate-800 text-lg">Security Settings</h3>
+                <div className={`border-b pb-6 ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+                   <h3 className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Security Settings</h3>
                    <p className="text-slate-500 text-sm">Update your password to keep your account safe.</p>
                 </div>
                 <div className="max-w-md mx-auto space-y-5 py-4">
@@ -1503,21 +1525,21 @@ function SettingsView({ user, onUpdateUser }) {
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Current Password</label>
                       <div className="relative">
                         <Lock className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input type="password" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={passwordData.current} onChange={e => setPasswordData({...passwordData, current: e.target.value})} placeholder="••••••••" />
+                        <input type="password" className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={passwordData.current} onChange={e => setPasswordData({...passwordData, current: e.target.value})} placeholder="••••••••" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">New Password</label>
                       <div className="relative">
                         <Key className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input type="password" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={passwordData.new} onChange={e => setPasswordData({...passwordData, new: e.target.value})} placeholder="New secure password" />
+                        <input type="password" className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={passwordData.new} onChange={e => setPasswordData({...passwordData, new: e.target.value})} placeholder="New secure password" />
                       </div>
                    </div>
                    <div>
                       <label className="block text-xs font-bold text-slate-500 uppercase mb-1.5">Confirm New Password</label>
                       <div className="relative">
                         <CheckCircle2 className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
-                        <input type="password" className="w-full pl-9 pr-3 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm" value={passwordData.confirm} onChange={e => setPasswordData({...passwordData, confirm: e.target.value})} placeholder="Repeat new password" />
+                        <input type="password" className={`w-full pl-9 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-600 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900'}`} value={passwordData.confirm} onChange={e => setPasswordData({...passwordData, confirm: e.target.value})} placeholder="Repeat new password" />
                       </div>
                    </div>
                    <div className="pt-2">
@@ -1534,27 +1556,27 @@ function SettingsView({ user, onUpdateUser }) {
   );
 }
 
-function NavButton({ active, onClick, icon, label }) {
+function NavButton({ active, onClick, icon, label, isDarkMode }) {
   return (
-    <button onClick={onClick} className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${active ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
+    <button onClick={onClick} className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${active ? 'bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20 shadow-sm' : isDarkMode ? 'text-slate-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}>
       {/* Active Indicator Bar */}
       {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-r-full shadow-[0_0_10px_2px_rgba(99,102,241,0.5)]"></div>}
       
-      {React.cloneElement(icon, { className: `w-5 h-5 transition-colors ${active ? 'text-indigo-400' : 'group-hover:text-white'}` })}
+      {React.cloneElement(icon, { className: `w-5 h-5 transition-colors ${active ? 'text-indigo-500' : isDarkMode ? 'group-hover:text-white' : 'group-hover:text-slate-900'}` })}
       <span className="font-bold text-xs uppercase tracking-widest">{label}</span>
-      {active && <ChevronRight className="w-4 h-4 ml-auto opacity-50 text-indigo-400" />}
+      {active && <ChevronRight className="w-4 h-4 ml-auto opacity-50 text-indigo-500" />}
     </button>
   );
 }
 
-function NavButtonMobile({ active, onClick, icon, label }) {
+function NavButtonMobile({ active, onClick, icon, label, isDarkMode }) {
   return (
     <button 
       onClick={onClick} 
-      className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative ${active ? 'text-indigo-400 -translate-y-1' : 'text-slate-400 hover:text-slate-300'}`}
+      className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative ${active ? 'text-indigo-500 -translate-y-1' : isDarkMode ? 'text-slate-400 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}
     >
       {active && <div className="absolute -top-2 w-8 h-1 bg-indigo-500 rounded-full shadow-[0_2px_8px_rgba(99,102,241,0.4)]"></div>}
-      {React.cloneElement(icon, { className: `w-6 h-6 ${active ? 'fill-current opacity-20' : ''}` })}
+      {React.cloneElement(icon, { className: `w-6 h-6 ${active ? 'fill-current opacity-100' : 'opacity-70'}` })}
       <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
     </button>
   );
