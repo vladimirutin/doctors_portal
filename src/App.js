@@ -191,7 +191,6 @@ export default function App() {
   };
 
   // --- NEW: SAVE TO DB AND START NEW ---
-  // This is called when the user clicks "New Rx" in the Preview screen
   const handleSaveAndNew = async () => {
     if (!currentPrescription) return;
 
@@ -355,9 +354,7 @@ export default function App() {
             <nav className="relative z-10 flex-1 p-4 space-y-2 overflow-y-auto">
               <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Clinical Workspace</div>
               
-              {/* UPDATED: Renamed to Prescription Writer & Removes Reset Logic */}
               <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="Prescription Writer" isDarkMode={isDarkMode} />
-              
               <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" isDarkMode={isDarkMode} />
               
               <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Management</div>
@@ -439,12 +436,12 @@ export default function App() {
                   data={currentPrescription} 
                   doctor={user} 
                   onBack={() => setCurrentView('dashboard')}
-                  onNew={handleSaveAndNew} // Uses the new Save & New logic
+                  onNew={handleSaveAndNew} 
                 />
               )}
             </main>
 
-            {/* MOBILE BOTTOM NAVIGATION - HIDDEN ON PRINT */}
+            {/* MOBILE BOTTOM NAVIGATION */}
             <nav className={`mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 border-t flex justify-around px-2 py-3 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.1)] pb-safe transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
               <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="Writer" isDarkMode={isDarkMode} />
               <NavButtonMobile active={currentView === 'history'} onClick={() => handleNavClick('history')} icon={<History />} label="History" isDarkMode={isDarkMode} />
@@ -465,8 +462,6 @@ export default function App() {
     </div>
   );
 }
-
-// ... AuthScreen, OnboardingScreen remain unchanged ...
 
 // --- SUB-COMPONENTS ---
 
@@ -806,7 +801,6 @@ function Dashboard({
   items,
   setItems
 }) {
-  // Removed local useState for patient and items, replaced with props
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMed, setSelectedMed] = useState(null);
   const [tempQty, setTempQty] = useState(1);
@@ -817,7 +811,6 @@ function Dashboard({
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [mobileView, setMobileView] = useState('editor');
   
-  // State to track if we are editing an item
   const [editingId, setEditingId] = useState(null);
 
   const filteredMeds = medicineList.filter(m => 
@@ -1355,6 +1348,7 @@ function MedicineManager({ medicines, onAdd, onDelete, isDarkMode }) {
 function HistoryView({ user, isDarkMode }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -1372,22 +1366,76 @@ function HistoryView({ user, isDarkMode }) {
     };
     fetchHistory();
   }, [user.email]);
+
+  // --- Local Delete Handler (Single) ---
+  const handleRemoveLocal = (id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to remove this record from your view?\n\n⚠️ NOTE: This ONLY hides it from this list to reduce clutter. The prescription record stays saved in the database."
+    );
+    
+    if (isConfirmed) {
+      setHistory(prev => prev.filter(record => record.id !== id));
+    }
+  };
+
+  // --- NEW: Clear All Handler (Overall) ---
+  const handleClearAllLocal = () => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to clear ALL records from this view?\n\n⚠️ NOTE: This acts as a 'Clear History' for your screen only. All prescription records remain safe in the database."
+    );
+    
+    if (isConfirmed) {
+      setHistory([]);
+    }
+  };
+
   return (
     <div className={`p-4 md:p-8 h-full overflow-y-auto ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
       <div className={`max-w-6xl mx-auto rounded-2xl shadow-sm border overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
-        <div className={`p-6 border-b flex justify-between items-center text-sm font-bold uppercase tracking-widest ${isDarkMode ? 'border-slate-700 text-slate-300' : 'border-slate-100 text-slate-800'}`}>Recent Activity</div>
+        {/* Updated Header with Clear All Button */}
+        <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+            <span className={`text-sm font-bold uppercase tracking-widest ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>Recent Activity</span>
+            {history.length > 0 && (
+                <button 
+                    onClick={handleClearAllLocal}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-2 ${isDarkMode ? 'border-rose-900/30 text-rose-400 hover:bg-rose-900/20' : 'border-rose-100 text-rose-600 hover:bg-rose-50'}`}
+                >
+                    <Trash2 className="w-3.5 h-3.5" /> Clear View
+                </button>
+            )}
+        </div>
+        
         <table className="w-full text-left text-sm">
           <thead className={`border-b text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
-            <tr><th className="px-6 py-4">Date Issued</th><th className="px-6 py-4">Patient Name</th><th className="px-6 py-4 text-right">Amount</th></tr>
+            <tr>
+                <th className="px-6 py-4">Date Issued</th>
+                <th className="px-6 py-4">Patient Name</th>
+                <th className="px-6 py-4 text-right">Amount</th>
+                <th className="px-6 py-4 text-center">Action</th>
+            </tr>
           </thead>
           <tbody className={`divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-100'}`}>
-            {loading ? <tr><td colSpan="3" className="p-12 text-center text-slate-400 italic">Syncing...</td></tr> : history.map(r => (
+            {loading ? (
+                <tr><td colSpan="4" className="p-12 text-center text-slate-400 italic">Syncing...</td></tr>
+            ) : history.length === 0 ? (
+                <tr><td colSpan="4" className="p-12 text-center text-slate-400 italic">No recent activity found in this session.</td></tr>
+            ) : (
+                history.map(r => (
               <tr key={r.id} className={`transition-colors ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}`}>
                 <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{r.date}</td>
                 <td className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{r.patient.name}</td>
                 <td className="px-6 py-4 text-right font-bold text-emerald-600">₱{r.grandTotal.toFixed(2)}</td>
+                <td className="px-6 py-4 text-center">
+                    <button 
+                        onClick={() => handleRemoveLocal(r.id)} 
+                        className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-900/20' : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'}`} 
+                        title="Hide from list"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </td>
               </tr>
-            ))}
+            )))}
           </tbody>
         </table>
       </div>
