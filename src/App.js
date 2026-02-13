@@ -191,6 +191,7 @@ export default function App() {
   };
 
   // --- NEW: SAVE TO DB AND START NEW ---
+  // This is called when the user clicks "New Rx" in the Preview screen
   const handleSaveAndNew = async () => {
     if (!currentPrescription) return;
 
@@ -354,7 +355,9 @@ export default function App() {
             <nav className="relative z-10 flex-1 p-4 space-y-2 overflow-y-auto">
               <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Clinical Workspace</div>
               
+              {/* UPDATED: Renamed to Prescription Writer & Removes Reset Logic */}
               <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="Prescription Writer" isDarkMode={isDarkMode} />
+              
               <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" isDarkMode={isDarkMode} />
               
               <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Management</div>
@@ -1156,7 +1159,6 @@ function Dashboard({
   );
 }
 
-// --- 4. PRESCRIPTION VIEW COMPONENT (Updated) ---
 function PrescriptionView({ data, doctor, onBack, onNew }) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qrValue)}`;
 
@@ -1367,7 +1369,6 @@ function HistoryView({ user, isDarkMode }) {
     fetchHistory();
   }, [user.email]);
 
-  // --- Local Delete Handler (Single) ---
   const handleRemoveLocal = (id) => {
     const isConfirmed = window.confirm(
       "Are you sure you want to remove this record from your view?\n\n⚠️ NOTE: This ONLY hides it from this list to reduce clutter. The prescription record stays saved in the database."
@@ -1378,7 +1379,6 @@ function HistoryView({ user, isDarkMode }) {
     }
   };
 
-  // --- NEW: Clear All Handler (Overall) ---
   const handleClearAllLocal = () => {
     const isConfirmed = window.confirm(
       "Are you sure you want to clear ALL records from this view?\n\n⚠️ NOTE: This acts as a 'Clear History' for your screen only. All prescription records remain safe in the database."
@@ -1392,7 +1392,6 @@ function HistoryView({ user, isDarkMode }) {
   return (
     <div className={`p-4 md:p-8 h-full overflow-y-auto ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
       <div className={`max-w-6xl mx-auto rounded-2xl shadow-sm border overflow-hidden ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
-        {/* Updated Header with Clear All Button */}
         <div className={`p-6 border-b flex justify-between items-center ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
             <span className={`text-sm font-bold uppercase tracking-widest ${isDarkMode ? 'text-slate-300' : 'text-slate-800'}`}>Recent Activity</span>
             {history.length > 0 && (
@@ -1405,7 +1404,8 @@ function HistoryView({ user, isDarkMode }) {
             )}
         </div>
         
-        <table className="w-full text-left text-sm">
+        {/* DESKTOP TABLE */}
+        <table className="w-full text-left text-sm hidden md:table">
           <thead className={`border-b text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
             <tr>
                 <th className="px-6 py-4">Date Issued</th>
@@ -1438,6 +1438,34 @@ function HistoryView({ user, isDarkMode }) {
             )))}
           </tbody>
         </table>
+
+        {/* MOBILE LIST (Cards) */}
+        <div className={`md:hidden divide-y ${isDarkMode ? 'divide-slate-700' : 'divide-slate-100'}`}>
+            {loading ? (
+                <div className="p-8 text-center text-slate-400 italic">Syncing...</div>
+            ) : history.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 italic">No recent activity found.</div>
+            ) : (
+                history.map(r => (
+                    <div key={r.id} className={`p-4 flex items-center justify-between transition-colors ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}`}>
+                        <div>
+                            <div className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>{r.patient.name}</div>
+                            <div className={`text-xs mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{r.date}</div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span className="font-bold text-emerald-600">₱{r.grandTotal.toFixed(2)}</span>
+                            <button 
+                                onClick={() => handleRemoveLocal(r.id)} 
+                                className={`p-3 rounded-lg transition-colors border ${isDarkMode ? 'text-rose-400 border-rose-900/30 bg-rose-900/10 active:bg-rose-900/30' : 'text-rose-600 border-rose-100 bg-rose-50 active:bg-rose-100'}`} 
+                                title="Hide"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
       </div>
     </div>
   );
