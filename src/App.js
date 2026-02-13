@@ -6,35 +6,37 @@ import {
   Plus, 
   Trash2, 
   Printer, 
-  LayoutDashboard,
-  Clock,
-  History,
-  Settings,
-  Pill,
-  Save,
-  X,
-  Building,
-  Phone,
-  MapPin,
-  FileBadge,
-  Search,
-  AlertCircle,
-  FileText,
-  LogOut,
-  ShieldCheck,
-  ChevronRight,
-  Activity,
-  QrCode,
-  CheckCircle2,
-  Mail,
-  Eye,
-  Key,
-  ArrowRight,
-  Sparkles,
-  Award,
+  LayoutDashboard, 
+  Clock, 
+  History, 
+  Settings, 
+  Pill, 
+  Save, 
+  X, 
+  Building, 
+  Phone, 
+  MapPin, 
+  FileBadge, 
+  Search, 
+  AlertCircle, 
+  FileText, 
+  LogOut, 
+  ShieldCheck, 
+  ChevronRight, 
+  Activity, 
+  QrCode, 
+  CheckCircle2, 
+  Mail, 
+  Eye, 
+  Key, 
+  ArrowRight, 
+  Sparkles, 
+  Award, 
   HelpCircle,
   Sun,
-  Moon
+  Moon,
+  Pencil,
+  Download
 } from 'lucide-react';
 import { initializeApp } from "firebase/app";
 import { 
@@ -42,18 +44,18 @@ import {
   collection, 
   doc, 
   setDoc, 
-  getDoc,
-  updateDoc,
-  serverTimestamp,
-  getDocs,
-  query,
-  where,
+  getDoc, 
+  updateDoc, 
+  serverTimestamp, 
+  getDocs, 
+  query, 
+  where, 
   limit
 } from "firebase/firestore";
 import { 
   getAuth, 
-  onAuthStateChanged,
-  signInAnonymously
+  onAuthStateChanged, 
+  signInAnonymously 
 } from "firebase/auth";
 
 // --- FIREBASE SETUP ---
@@ -90,6 +92,10 @@ export default function App() {
   const [currentPrescription, setCurrentPrescription] = useState(null);
   const [medicineList, setMedicineList] = useState(DEFAULT_MEDICINES);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // --- STATE LIFTED UP: Persists between Editor and Preview ---
+  const [patient, setPatient] = useState({ name: '', age: '', sex: 'Male' });
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     signInAnonymously(auth).catch((err) => console.error("Auth failed:", err));
@@ -178,34 +184,61 @@ export default function App() {
     }
   };
 
-  const handleGenerate = async (prescriptionData) => {
+  // --- UPDATED: JUST PREVIEW, NO SAVE YET ---
+  const handleGenerate = (prescriptionData) => {
     setCurrentPrescription(prescriptionData);
+    setCurrentView('prescription');
+  };
+
+  // --- NEW: SAVE TO DB AND START NEW ---
+  // This is called when the user clicks "New Rx" in the Preview screen
+  const handleSaveAndNew = async () => {
+    if (!currentPrescription) return;
+
     try {
-      const rxRef = doc(db, 'artifacts', appId, 'public', 'data', 'prescriptions', prescriptionData.id);
+      const rxRef = doc(db, 'artifacts', appId, 'public', 'data', 'prescriptions', currentPrescription.id);
       const cloudData = {
-        id: prescriptionData.id,
-        date: prescriptionData.date,
+        id: currentPrescription.id,
+        date: currentPrescription.date,
         status: 'issued',
-        patient: prescriptionData.patient,
-        items: prescriptionData.items,
-        grandTotal: prescriptionData.grandTotal,
+        patient: currentPrescription.patient,
+        items: currentPrescription.items,
+        grandTotal: currentPrescription.grandTotal,
         doctorName: user.name,
         doctorLicense: user.license,
         doctorEmail: user.email,
         clinicDetails: user.clinicDetails,
         createdAt: serverTimestamp()
       };
+      
+      // 1. Save to Database
       await setDoc(rxRef, cloudData);
+      
+      // 2. Clear Local State
+      setPatient({ name: '', age: '', sex: 'Male' });
+      setItems([]);
+      setCurrentPrescription(null);
+      
+      // 3. Go back to Editor
+      setCurrentView('dashboard');
+      
     } catch (e) {
       console.error("Failed to upload prescription:", e);
+      alert("Error saving prescription. Please check connection.");
     }
-    setCurrentView('prescription');
   };
 
   const handleLogout = () => {
     setUser(null);
     setCurrentPrescription(null);
+    setPatient({ name: '', age: '', sex: 'Male' });
+    setItems([]);
     setCurrentView('auth');
+  };
+
+  // Nav Logic
+  const handleNavClick = (view) => {
+    setCurrentView(view);
   };
 
   return (
@@ -321,7 +354,10 @@ export default function App() {
             
             <nav className="relative z-10 flex-1 p-4 space-y-2 overflow-y-auto">
               <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Clinical Workspace</div>
-              <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="New Prescription" isDarkMode={isDarkMode} />
+              
+              {/* UPDATED: Renamed to Prescription Writer & Removes Reset Logic */}
+              <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="Prescription Writer" isDarkMode={isDarkMode} />
+              
               <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" isDarkMode={isDarkMode} />
               
               <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Management</div>
@@ -352,7 +388,7 @@ export default function App() {
             <header className={`no-print border-b flex items-center justify-between px-4 md:px-8 shadow-md z-20 shrink-0 sticky top-0 transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/5' : 'bg-white border-slate-200'}`}>
               <div>
                 <h2 className={`text-lg md:text-xl font-bold tracking-tight capitalize flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                  {currentView === 'dashboard' ? <><LayoutDashboard className="w-5 h-5 text-indigo-500"/> New Prescription</> : 
+                  {currentView === 'dashboard' ? <><LayoutDashboard className="w-5 h-5 text-indigo-500"/> Prescription Writer</> : 
                    currentView === 'medicines' ? <><Pill className="w-5 h-5 text-emerald-500"/> Medicine List</> : 
                    currentView === 'history' ? <><History className="w-5 h-5 text-indigo-500"/> Patient History</> :
                    currentView === 'prescription' ? <><Printer className="w-5 h-5 text-indigo-500"/> Prescription Preview</> :
@@ -382,6 +418,10 @@ export default function App() {
                   medicineList={medicineList}
                   onAddCustomMedicine={handleAddMedicine}
                   isDarkMode={isDarkMode}
+                  patient={patient}
+                  setPatient={setPatient}
+                  items={items}
+                  setItems={setItems}
                 />
               )}
               {currentView === 'history' && <HistoryView user={user} isDarkMode={isDarkMode} />}
@@ -398,19 +438,19 @@ export default function App() {
                 <PrescriptionView 
                   data={currentPrescription} 
                   doctor={user} 
-                  onBack={() => setCurrentView('dashboard')} 
+                  onBack={() => setCurrentView('dashboard')}
+                  onNew={handleSaveAndNew} // Uses the new Save & New logic
                 />
               )}
             </main>
 
             {/* MOBILE BOTTOM NAVIGATION - HIDDEN ON PRINT */}
             <nav className={`mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 border-t flex justify-around px-2 py-3 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.1)] pb-safe transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
-              <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="New Rx" isDarkMode={isDarkMode} />
-              <NavButtonMobile active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History />} label="History" isDarkMode={isDarkMode} />
-              <NavButtonMobile active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill />} label="Meds List" isDarkMode={isDarkMode} />
-              <NavButtonMobile active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings />} label="Account" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="Writer" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'history'} onClick={() => handleNavClick('history')} icon={<History />} label="History" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'medicines'} onClick={() => handleNavClick('medicines')} icon={<Pill />} label="Meds List" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'settings'} onClick={() => handleNavClick('settings')} icon={<Settings />} label="Account" isDarkMode={isDarkMode} />
               
-              {/* ADDED LOGOUT BUTTON FOR MOBILE */}
               <button 
                 onClick={handleLogout}
                 className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative text-slate-400 hover:text-rose-500"
@@ -570,19 +610,19 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                 <div className="relative group">
                    <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Full Name</label>
                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                      </div>
-                      <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                       <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                     </div>
+                     <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                    </div>
                 </div>
                 <div className="relative group">
                    <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Medical License</label>
                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FileBadge className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                      </div>
-                      <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
+                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                       <FileBadge className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                     </div>
+                     <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
                    </div>
                 </div>
               </div>
@@ -591,20 +631,20 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
             <div className="relative group">
                <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Email Address</label>
                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                  </div>
-                  <input required type="email" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                   <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                 </div>
+                 <input required type="email" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                </div>
             </div>
 
             <div className="relative group">
                <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Password</label>
                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                  </div>
-                  <input required type="password" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                   <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                 </div>
+                 <input required type="password" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
                </div>
             </div>
 
@@ -660,7 +700,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                  <HelpCircle className="w-3 h-3"/> Customer Service
                </div>
                <p className="font-mono text-slate-300 flex items-center gap-2 font-bold">
-                 <Phone className="w-3 h-3"/> (02) 8-7000-000
+                 <Phone className="w-3 h-3"/> 09273523900
                </p>
             </div>
           </div>
@@ -755,9 +795,18 @@ function OnboardingScreen({ onComplete, user }) {
   );
 }
 
-function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDarkMode }) {
-  const [patient, setPatient] = useState({ name: '', age: '', sex: 'Male' });
-  const [items, setItems] = useState([]);
+function Dashboard({ 
+  user, 
+  onGenerate, 
+  medicineList, 
+  onAddCustomMedicine, 
+  isDarkMode,
+  patient,
+  setPatient,
+  items,
+  setItems
+}) {
+  // Removed local useState for patient and items, replaced with props
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMed, setSelectedMed] = useState(null);
   const [tempQty, setTempQty] = useState(1);
@@ -766,7 +815,10 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
   const [tempPrice, setTempPrice] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
-  const [mobileView, setMobileView] = useState('editor'); // 'editor' | 'preview'
+  const [mobileView, setMobileView] = useState('editor');
+  
+  // State to track if we are editing an item
+  const [editingId, setEditingId] = useState(null);
 
   const filteredMeds = medicineList.filter(m => 
     m.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -796,15 +848,24 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
     if (!selectedMed) return;
     const parsedPrice = parseFloat(tempPrice) || 0;
     const parsedQty = parseInt(tempQty) || 1;
-    setItems([...items, {
+    
+    const newItem = {
       ...selectedMed,
-      uniqueId: Date.now(),
+      uniqueId: editingId || Date.now(),
       quantity: parsedQty,
       dosage: tempDosage, 
       price: parsedPrice, 
       instructions: tempInstr || 'As directed by physician',
       totalPrice: parsedPrice * parsedQty
-    }]);
+    };
+
+    if (editingId) {
+        setItems(items.map(item => item.uniqueId === editingId ? newItem : item));
+        setEditingId(null);
+    } else {
+        setItems([...items, newItem]);
+    }
+
     setSelectedMed(null);
     setSearchQuery('');
     setTempQty(1);
@@ -813,9 +874,33 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
     setTempPrice(0);
   };
 
-  const removeItem = (id) => setItems(items.filter(i => i.uniqueId !== id));
+  const startEditing = (item) => {
+      setEditingId(item.uniqueId);
+      setSelectedMed(item); 
+      setSearchQuery(item.name);
+      setTempQty(item.quantity);
+      setTempDosage(item.dosage);
+      setTempPrice(item.price);
+      setTempInstr(item.instructions);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  const handleGenerate = () => {
+  const cancelEdit = () => {
+      setEditingId(null);
+      setSelectedMed(null);
+      setSearchQuery('');
+      setTempQty(1);
+      setTempInstr('');
+      setTempDosage('');
+      setTempPrice(0);
+  };
+
+  const removeItem = (id) => {
+      if (editingId === id) cancelEdit();
+      setItems(items.filter(i => i.uniqueId !== id));
+  };
+
+  const handleGenerateClick = () => {
     if (!patient.name || items.length === 0) return;
     const grandTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
     const uniqueId = `RX-${Math.floor(Math.random() * 1000000)}`; 
@@ -890,14 +975,14 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
           <div className="flex justify-between items-center mb-6">
             <h3 className={`font-bold flex items-center gap-2 ${isDarkMode ? 'text-slate-100' : 'text-slate-800'}`}>
               <div className={`p-1.5 rounded-lg ${isDarkMode ? 'bg-emerald-900/30' : 'bg-emerald-100'}`}><Pill className="w-4 h-4 text-emerald-600" /></div>
-              Prescribe Medicine
+              {editingId ? 'Edit Medicine' : 'Prescribe Medicine'}
             </h3>
             <button onClick={() => setIsCustomModalOpen(true)} className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${isDarkMode ? 'text-indigo-400 bg-indigo-900/30 hover:bg-indigo-900/50' : 'text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100'}`}>
               <Plus className="w-3 h-3" /> Custom Item
             </button>
           </div>
 
-          <div className={`p-4 md:p-5 rounded-xl border mb-6 relative group focus-within:border-indigo-300 focus-within:shadow-md transition-all ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50/50 border-slate-200'}`}>
+          <div className={`p-4 md:p-5 rounded-xl border mb-6 relative group focus-within:border-indigo-300 focus-within:shadow-md transition-all ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50/50 border-slate-200'} ${editingId ? 'ring-2 ring-indigo-500/20' : ''}`}>
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 md:col-span-8 relative">
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Medicine Name</label>
@@ -942,9 +1027,14 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Instructions</label>
                 <input type="text" className={`w-full px-3 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ${isDarkMode ? 'bg-slate-800 border-slate-600 text-white' : 'bg-white border-slate-200'}`} placeholder="e.g. 1 tab after meals" value={tempInstr} onChange={e => setTempInstr(e.target.value)} />
               </div>
-              <div className="col-span-12">
-                <button onClick={addItem} disabled={!selectedMed} className={`w-full py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 transform active:scale-[0.98] ${selectedMed ? 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:shadow-slate-500/20' : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'}`}>
-                  <Plus className="w-4 h-4" /> Add to List
+              <div className="col-span-12 flex gap-3">
+                {editingId && (
+                    <button onClick={cancelEdit} className={`flex-1 py-3.5 rounded-xl text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2 ${isDarkMode ? 'bg-slate-700 text-white hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                        Cancel
+                    </button>
+                )}
+                <button onClick={addItem} disabled={!selectedMed} className={`flex-[2] py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center justify-center gap-2 transform active:scale-[0.98] ${!selectedMed ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' : editingId ? 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-blue-500/20' : 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:shadow-slate-500/20'}`}>
+                  {editingId ? <><Save className="w-4 h-4" /> Update Item</> : <><Plus className="w-4 h-4" /> Add to List</>}
                 </button>
               </div>
             </div>
@@ -958,7 +1048,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
               </div>
             ) : (
               items.map((item, index) => (
-                <div key={item.uniqueId} className={`flex items-center justify-between p-4 rounded-xl border shadow-sm transition-all group ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-indigo-500/50' : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-md'}`}>
+                <div key={item.uniqueId} className={`flex items-center justify-between p-4 rounded-xl border shadow-sm transition-all group ${editingId === item.uniqueId ? 'border-blue-500 ring-1 ring-blue-500/20' : isDarkMode ? 'bg-slate-800 border-slate-700 hover:border-indigo-500/50' : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-md'}`}>
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border shrink-0 transition-colors ${isDarkMode ? 'bg-slate-700 border-slate-600 text-slate-300 group-hover:bg-indigo-900/50 group-hover:text-indigo-400' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600'}`}>
                       {index + 1}
@@ -972,11 +1062,14 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
                       <div className="text-xs text-slate-400 italic mt-1 truncate max-w-[200px]">{item.instructions}</div>
                     </div>
                   </div>
-                  <div className="text-right flex items-center gap-4 shrink-0">
-                    <div>
+                  <div className="text-right flex items-center gap-2 shrink-0">
+                    <div className="mr-2">
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Qty: {item.quantity}</div>
                       <div className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>₱{item.totalPrice.toFixed(2)}</div>
                     </div>
+                    <button onClick={() => startEditing(item)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-blue-400 hover:bg-blue-900/20' : 'text-blue-500 hover:bg-blue-50'}`}>
+                      <Pencil className="w-5 h-5" />
+                    </button>
                     <button onClick={() => removeItem(item.uniqueId)} className={`p-2 rounded-lg transition-colors ${isDarkMode ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-900/20' : 'text-slate-300 hover:text-rose-500 hover:bg-rose-50'}`}>
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -998,7 +1091,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
         
         {/* CHANGED BG TO #0B0F19 TO SHOW PAPER CONTRAST */}
         <div className={`flex-1 overflow-y-auto p-4 md:p-6 flex justify-center ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-slate-50'}`}>
-          <div className="bg-white w-full max-w-md shadow-2xl border border-slate-200 p-6 md:p-10 min-h-[600px] text-sm relative transition-all duration-500 ease-in-out transform hover:scale-[1.01] ring-1 ring-black/5">
+          <div className="bg-white text-slate-800 w-full max-w-md shadow-2xl border border-slate-200 p-6 md:p-10 min-h-[600px] text-sm relative transition-all duration-500 ease-in-out transform hover:scale-[1.01] ring-1 ring-black/5">
             {/* Paper texture effect */}
             <div className="absolute inset-0 bg-white opacity-50 pointer-events-none mix-blend-multiply"></div>
 
@@ -1006,7 +1099,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
               <h1 className="text-xl md:text-2xl font-serif font-bold uppercase tracking-widest text-slate-900">{user?.clinicDetails?.name || 'Clinic Name'}</h1>
               <p className="text-xs text-slate-600 whitespace-pre-line mt-2 font-serif">{user?.clinicDetails?.address || 'Clinic Address'}</p>
               <div className="flex justify-between items-end mt-6 pt-4 border-t border-slate-100">
-                <div className="text-xs space-y-1 font-serif">
+                <div className="text-xs space-y-1 font-serif text-slate-800">
                   <p><span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Patient:</span> <span className="text-base font-semibold">{patient.name || '___________'}</span></p>
                   <p><span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Age/Sex:</span> {patient.age || '__'} / {patient.sex}</p>
                   <p><span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">Date:</span> {new Date().toLocaleDateString()}</p>
@@ -1055,7 +1148,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
               ₱{items.reduce((sum, i) => sum + i.totalPrice, 0).toFixed(2)}
             </span>
           </div>
-          <button onClick={handleGenerate} disabled={items.length === 0 || !patient.name} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 text-lg active:scale-[0.98]">
+          <button onClick={handleGenerateClick} disabled={items.length === 0 || !patient.name} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 text-lg active:scale-[0.98]">
             <Printer className="w-6 h-6" /> Generate Prescription
           </button>
         </div>
@@ -1070,19 +1163,29 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
   );
 }
 
-// --- 4. PRESCRIPTION VIEW COMPONENT (Restored) ---
-function PrescriptionView({ data, doctor, onBack }) {
+// --- 4. PRESCRIPTION VIEW COMPONENT (Updated) ---
+function PrescriptionView({ data, doctor, onBack, onNew }) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qrValue)}`;
 
   return (
     <div className="flex flex-col h-full bg-slate-100 overflow-hidden print:bg-white print:overflow-visible">
       {/* TOOLBAR HIDDEN ON PRINT */}
-      <div className="no-print bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex justify-between items-center shadow-sm shrink-0">
-        <button onClick={onBack} className="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 transition-colors">
+      <div className="no-print bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex flex-col md:flex-row justify-between items-center shadow-sm shrink-0 gap-4 md:gap-0">
+        <button onClick={onBack} className="text-slate-500 hover:text-slate-800 font-medium flex items-center gap-2 transition-colors self-start md:self-auto">
           <LayoutDashboard className="w-4 h-4" /> <span className="hidden md:inline">Back to Editor</span> <span className="md:hidden">Back</span>
         </button>
-        <div className="flex items-center gap-3">
+        
+        <div className="flex items-center gap-3 self-end md:self-auto w-full md:w-auto justify-end">
           <div className="text-xs md:text-sm text-slate-500 mr-2 md:mr-4 hidden sm:block">ID: <span className="font-mono font-bold text-slate-800">{data.id}</span></div>
+          
+          <button onClick={onNew} className="bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 px-4 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-sm transition-all active:scale-95 text-sm md:text-base whitespace-nowrap">
+             <Plus className="w-4 h-4" /> New Rx
+          </button>
+
+          <button onClick={() => window.print()} className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-4 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-sm transition-all active:scale-95 text-sm md:text-base">
+            <Download className="w-4 h-4" /> <span className="hidden sm:inline">PDF</span>
+          </button>
+
           <button onClick={() => window.print()} className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-lg shadow-slate-900/20 transition-all active:scale-95 text-sm md:text-base">
             <Printer className="w-4 h-4" /> Print
           </button>
@@ -1165,8 +1268,6 @@ function PrescriptionView({ data, doctor, onBack }) {
   );
 }
 
-// MedicineManager, HistoryView, NavButton, PasswordModal, CustomMedicineForm, NavButtonMobile remain as previously defined
-
 function MedicineManager({ medicines, onAdd, onDelete, isDarkMode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchQuery] = useState('');
@@ -1234,7 +1335,7 @@ function MedicineManager({ medicines, onAdd, onDelete, isDarkMode }) {
                       onClick={() => onDelete(med.id)} 
                       className={`mt-2 w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold active:scale-95 transition-all border ${isDarkMode ? 'text-rose-400 bg-rose-900/10 border-rose-900/30 hover:bg-rose-900/30' : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-100'}`}
                     >
-                       <Trash2 className="w-4 h-4" /> Remove Item
+                        <Trash2 className="w-4 h-4" /> Remove Item
                     </button>
                  </div>
                ))
@@ -1295,7 +1396,6 @@ function HistoryView({ user, isDarkMode }) {
 }
 
 function SettingsView({ user, onUpdateUser, isDarkMode }) {
-  // ... (Keeping exact same logic from previous turn for settings, just updating styles if needed)
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState(null);
@@ -1559,7 +1659,6 @@ function SettingsView({ user, onUpdateUser, isDarkMode }) {
 function NavButton({ active, onClick, icon, label, isDarkMode }) {
   return (
     <button onClick={onClick} className={`flex w-full items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${active ? 'bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20 shadow-sm' : isDarkMode ? 'text-slate-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}>
-      {/* Active Indicator Bar */}
       {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-r-full shadow-[0_0_10px_2px_rgba(99,102,241,0.5)]"></div>}
       
       {React.cloneElement(icon, { className: `w-5 h-5 transition-colors ${active ? 'text-indigo-500' : isDarkMode ? 'group-hover:text-white' : 'group-hover:text-slate-900'}` })}
@@ -1579,24 +1678,6 @@ function NavButtonMobile({ active, onClick, icon, label, isDarkMode }) {
       {React.cloneElement(icon, { className: `w-6 h-6 ${active ? 'fill-current opacity-100' : 'opacity-70'}` })}
       <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
     </button>
-  );
-}
-
-function PasswordModal({ onClose, currentUser, onUpdate }) {
-  const [current, setCurrent] = useState('');
-  const [newPass, setNewPass] = useState('');
-  const handleSubmit = (e) => { e.preventDefault(); onUpdate(newPass); };
-  return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-sm">
-        <h3 className="font-bold mb-4">Change Password</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="password" required className="w-full p-3 border rounded-xl" placeholder="New Password" value={newPass} onChange={e => setNewPass(e.target.value)} />
-          <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Update</button>
-          <button onClick={onClose} type="button" className="w-full text-slate-400">Cancel</button>
-        </form>
-      </div>
-    </div>
   );
 }
 
