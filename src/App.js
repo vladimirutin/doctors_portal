@@ -527,9 +527,14 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
     <div className="flex h-screen w-full bg-[#0B0F19] font-sans text-slate-900 overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
       
-      {/* UPDATED LAPTOP LAYOUT: Tighter spacing (lg:), hidden scrollbar enabled (overflow-y-auto) to guarantee button access */}
-      <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center relative z-10 overflow-y-auto no-scrollbar p-6 md:p-8 lg:p-4 xl:p-12">
-        
+      {/* INVISIBLE SCROLLABLE LAYOUT for Small Screens (Laptop/Tablets)
+         - outer: overflow-y-auto no-scrollbar
+         - inner: min-h-full center
+         - This ensures content centers if space allows, but scrolls if height < content height (like laptops)
+      */}
+      <div className="w-full lg:w-1/2 h-full relative z-10 overflow-y-auto no-scrollbar">
+        <div className="min-h-full w-full flex flex-col items-center justify-center p-6 md:p-8 lg:p-4 xl:p-12">
+          
           {/* LOGIN CARD */}
           <div className="w-full max-w-md bg-white p-6 md:p-8 lg:p-6 xl:p-10 rounded-3xl shadow-2xl border-4 border-slate-200/20 animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden ring-1 ring-white/10 mb-4 lg:mb-4 xl:mb-6">
             
@@ -659,7 +664,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
               <p>© 2026 MediVend Systems. Secure & Compliant.</p>
             </div>
           </div>
-
+        </div>
       </div>
 
       {/* Right Side Hero */}
