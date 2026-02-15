@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/doctors_portal/static/css/main.31d6cfe0.css",
-    "main.js": "/doctors_portal/static/js/main.d4a654d7.js",
+    "main.js": "/doctors_portal/static/js/main.cfc417a7.js",
     "index.html": "/doctors_portal/index.html",
-    "main.d4a654d7.js.map": "/doctors_portal/static/js/main.d4a654d7.js.map"
+    "main.cfc417a7.js.map": "/doctors_portal/static/js/main.cfc417a7.js.map"
   },
   "entrypoints": [
     "static/css/main.31d6cfe0.css",
-    "static/js/main.d4a654d7.js"
+    "static/js/main.cfc417a7.js"
   ]
 }
