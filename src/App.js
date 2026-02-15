@@ -271,6 +271,14 @@ export default function App() {
              border-color: #6366f1; /* Indigo-500 */
              box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
           }
+          /* Hide Scrollbar for Laptop Safety Scroll */
+          .no-scrollbar::-webkit-scrollbar {
+             display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
           @media print {
             @page { size: auto; margin: 0.5in; }
             .no-print, nav, .mobile-nav-bar { display: none !important; }
@@ -519,29 +527,26 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
     <div className="flex h-screen w-full bg-[#0B0F19] font-sans text-slate-900 overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
       
-      {/* REVERTED TO CENTERED FLEX LAYOUT (No Scroll) 
-         Use lg:p-8 / lg:scale-95 or similar if needed, 
-         but for now we use responsive padding to fit laptops.
-      */}
-      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center p-6 md:p-8 lg:p-8 xl:p-12 relative z-10">
+      {/* UPDATED LAPTOP LAYOUT: Tighter spacing (lg:), hidden scrollbar enabled (overflow-y-auto) to guarantee button access */}
+      <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center relative z-10 overflow-y-auto no-scrollbar p-6 md:p-8 lg:p-4 xl:p-12">
         
           {/* LOGIN CARD */}
-          <div className="w-full max-w-md bg-white p-6 md:p-8 lg:p-8 xl:p-10 rounded-3xl shadow-2xl border-4 border-slate-200/20 animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden ring-1 ring-white/10 mb-4 lg:mb-6">
+          <div className="w-full max-w-md bg-white p-6 md:p-8 lg:p-6 xl:p-10 rounded-3xl shadow-2xl border-4 border-slate-200/20 animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden ring-1 ring-white/10 mb-4 lg:mb-4 xl:mb-6">
             
-            <div className="text-center mb-6 lg:mb-6 xl:mb-8 relative z-10">
-              <div className="inline-flex items-center justify-center w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-2xl shadow-lg shadow-indigo-500/30 mb-4 lg:mb-6 transform transition-transform hover:scale-105 ring-4 ring-white">
-                <Stethoscope className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+            <div className="text-center mb-6 lg:mb-4 xl:mb-8 relative z-10">
+              <div className="inline-flex items-center justify-center w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-2xl shadow-lg shadow-indigo-500/30 mb-4 lg:mb-4 transform transition-transform hover:scale-105 ring-4 ring-white">
+                <Stethoscope className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
               </div>
-              <h2 className="text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+              <h2 className="text-2xl lg:text-2xl xl:text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
                 {isLogin ? 'Welcome Back' : 'Join MediVend'}
               </h2>
-              <p className="text-slate-500 text-xs lg:text-sm">
+              <p className="text-slate-500 text-xs lg:text-xs xl:text-sm">
                 {isLogin ? 'Enter your credentials to access your dashboard.' : 'Start your digital prescription journey today.'}
               </p>
             </div>
 
             {pendingUserEmail && (
-              <div className="mb-4 lg:mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-start gap-3 animate-in fade-in">
+              <div className="mb-4 lg:mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-start gap-3 animate-in fade-in">
                 <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold">Account Pending Approval</p>
@@ -550,16 +555,16 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-5 relative z-10">
+            <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-3 xl:space-y-5 relative z-10">
               {!isLogin && (
-                <div className="space-y-4 lg:space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="space-y-4 lg:space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
                   <div className="relative group">
                     <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Full Name</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                       </div>
-                      <input required type="text" className="w-full pl-10 pr-4 py-2.5 lg:py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                      <input required type="text" className="w-full pl-10 pr-4 py-2.5 lg:py-2.5 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
                     </div>
                   </div>
                   <div className="relative group">
@@ -568,7 +573,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <FileBadge className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                       </div>
-                      <input required type="text" className="w-full pl-10 pr-4 py-2.5 lg:py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
+                      <input required type="text" className="w-full pl-10 pr-4 py-2.5 lg:py-2.5 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
                     </div>
                   </div>
                 </div>
@@ -580,7 +585,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                   </div>
-                  <input required type="email" className="w-full pl-10 pr-4 py-2.5 lg:py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  <input required type="email" className="w-full pl-10 pr-4 py-2.5 lg:py-2.5 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
                 </div>
               </div>
 
@@ -590,7 +595,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                   </div>
-                  <input required type="password" className="w-full pl-10 pr-4 py-2.5 lg:py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                  <input required type="password" className="w-full pl-10 pr-4 py-2.5 lg:py-2.5 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
                 </div>
               </div>
 
@@ -600,7 +605,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                 </div>
               )}
 
-              <button type="submit" disabled={isLoading || lockoutTimer > 0} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3 lg:py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] flex justify-center items-center">
+              <button type="submit" disabled={isLoading || lockoutTimer > 0} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3 lg:py-3 rounded-xl shadow-lg shadow-indigo-600/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] flex justify-center items-center">
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : lockoutTimer > 0 ? (
@@ -613,7 +618,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
               </button>
             </form>
 
-            <div className="mt-6 lg:mt-8 text-center relative z-10">
+            <div className="mt-6 lg:mt-4 text-center relative z-10">
               <p className="text-sm text-slate-600">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 <button 
