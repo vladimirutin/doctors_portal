@@ -184,14 +184,13 @@ export default function App() {
     }
   };
 
-  // --- UPDATED: JUST PREVIEW, NO SAVE YET ---
+  // --- GENERATE PREVIEW ---
   const handleGenerate = (prescriptionData) => {
     setCurrentPrescription(prescriptionData);
     setCurrentView('prescription');
   };
 
-  // --- NEW: SAVE TO DB AND START NEW ---
-  // This is called when the user clicks "New Rx" in the Preview screen
+  // --- SAVE TO DB AND START NEW (NEW Rx Button) ---
   const handleSaveAndNew = async () => {
     if (!currentPrescription) return;
 
@@ -211,20 +210,35 @@ export default function App() {
         createdAt: serverTimestamp()
       };
       
-      // 1. Save to Database
       await setDoc(rxRef, cloudData);
+
+      // Confirmation Alert
+      alert("Success! The patient's data has been recorded to the database.");
       
-      // 2. Clear Local State
+      // Clear Local State
       setPatient({ name: '', age: '', sex: 'Male' });
       setItems([]);
       setCurrentPrescription(null);
-      
-      // 3. Go back to Editor
       setCurrentView('dashboard');
       
     } catch (e) {
       console.error("Failed to upload prescription:", e);
       alert("Error saving prescription. Please check connection.");
+    }
+  };
+
+  // --- DISCARD PRESCRIPTION (Cancel Button) ---
+  const handleDiscardPrescription = () => {
+    const confirmed = window.confirm(
+      "⚠️ WARNING: Are you sure you want to cancel this prescription?\n\nThis will DISCARD all current data. Nothing will be saved to the database.\n\nYou will start a fresh, empty prescription."
+    );
+
+    if (confirmed) {
+      // Clear data only on confirm
+      setPatient({ name: '', age: '', sex: 'Male' });
+      setItems([]);
+      setCurrentPrescription(null);
+      setCurrentView('dashboard');
     }
   };
 
@@ -243,10 +257,9 @@ export default function App() {
 
   return (
     <div className={`h-[100dvh] font-sans overflow-hidden flex flex-col ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-800'}`}>
-      {/* PRINT ENGINE & GLOBAL STYLES */}
+      {/* GLOBAL STYLES */}
       <style>
         {`
-          /* Modern Input Field Style */
           .input-modern {
              background-color: ${isDarkMode ? '#1e293b' : '#f9fafb'};
              border: 1px solid ${isDarkMode ? '#334155' : '#e5e7eb'};
@@ -258,78 +271,22 @@ export default function App() {
              border-color: #6366f1; /* Indigo-500 */
              box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
           }
-
           @media print {
-            @page {
-              size: auto; 
-              margin: 0.5in;
-            }
-            .no-print {
-              display: none !important;
-            }
-            
-            nav, .mobile-nav-bar {
-              display: none !important;
-            }
-
-            body, html, #root {
-              background: white !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              height: auto !important;
-              overflow: visible !important;
-            }
-            
-            .printable-wrapper {
-              display: flex !important;
-              flex-direction: column !important;
-              min-height: 90vh !important;
-              width: 100% !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              box-shadow: none !important;
-              border: none !important;
-            }
-
-            .printable-content {
-              flex: 1 0 auto !important;
-              padding-bottom: 20px !important;
-            }
-
-            .printable-footer {
-              flex-shrink: 0 !important;
-              margin-top: auto !important;
-              width: 100% !important;
-              page-break-inside: avoid !important;
-              padding-top: 10px !important;
-              border-top: 1px solid #e2e8f0 !important;
-            }
-
+            @page { size: auto; margin: 0.5in; }
+            .no-print, nav, .mobile-nav-bar { display: none !important; }
+            body, html, #root { background: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+            .printable-wrapper { display: flex !important; flex-direction: column !important; min-height: 90vh !important; width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+            .printable-content { flex: 1 0 auto !important; padding-bottom: 20px !important; }
+            .printable-footer { flex-shrink: 0 !important; margin-top: auto !important; width: 100% !important; page-break-inside: avoid !important; padding-top: 10px !important; border-top: 1px solid #e2e8f0 !important; }
             .printable-wrapper h1 { font-size: 18pt !important; line-height: 1.2 !important; margin-bottom: 5px !important; }
             .printable-wrapper p, .printable-wrapper span { font-size: 10pt !important; }
             .printable-wrapper .text-xs { font-size: 8pt !important; }
             .printable-wrapper .text-sm { font-size: 9pt !important; }
             .printable-wrapper .text-lg { font-size: 11pt !important; }
             .printable-wrapper .text-4xl { font-size: 20pt !important; }
-
-            .printable-wrapper table td,
-            .printable-wrapper table th {
-              padding-top: 4px !important;
-              padding-bottom: 4px !important;
-              font-size: 10pt !important;
-            }
-            
-            .rx-watermark {
-               font-size: 8rem !important;
-               color: #94a3b8 !important;
-               opacity: 0.3 !important;
-               -webkit-print-color-adjust: exact !important;
-               print-color-adjust: exact !important;
-            }
-            
-            .print-min-h-reset {
-              min-height: auto !important;
-            }
+            .printable-wrapper table td, .printable-wrapper table th { padding-top: 4px !important; padding-bottom: 4px !important; font-size: 10pt !important; }
+            .rx-watermark { font-size: 8rem !important; color: #94a3b8 !important; opacity: 0.3 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .print-min-h-reset { min-height: auto !important; }
           }
         `}
       </style>
@@ -341,7 +298,6 @@ export default function App() {
         <div className={`flex h-full overflow-hidden print:bg-white print:block ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-white'}`}>
           {/* DESKTOP SIDEBAR */}
           <aside className={`no-print w-72 flex-col hidden md:flex border-r shadow-2xl z-30 relative overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-[#0B0F19] text-slate-300 border-white/5' : 'bg-white text-slate-600 border-slate-200'}`}>
-              
              <div className={`relative z-10 p-6 flex items-center gap-3 border-b ${isDarkMode ? 'border-white/5' : 'border-slate-100'}`}>
               <div className="bg-gradient-to-tr from-indigo-500 to-blue-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20 ring-1 ring-white/10">
                 <Stethoscope className="w-6 h-6 text-white" />
@@ -354,19 +310,13 @@ export default function App() {
             
             <nav className="relative z-10 flex-1 p-4 space-y-2 overflow-y-auto">
               <div className="px-3 mb-2 mt-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Clinical Workspace</div>
-              
-              {/* UPDATED: Renamed to Prescription Writer & Removes Reset Logic */}
               <NavButton active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard className="w-5 h-5" />} label="Prescription Writer" isDarkMode={isDarkMode} />
-              
               <NavButton active={currentView === 'history'} onClick={() => setCurrentView('history')} icon={<History className="w-5 h-5" />} label="Patient History" isDarkMode={isDarkMode} />
-              
               <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">Management</div>
                <NavButton active={currentView === 'medicines'} onClick={() => setCurrentView('medicines')} icon={<Pill className="w-5 h-5" />} label="Medicine List" isDarkMode={isDarkMode} />
-
               <div className="px-3 mt-8 mb-2 text-[10px] font-extrabold uppercase tracking-widest opacity-70">System</div>
               <NavButton active={currentView === 'settings'} onClick={() => setCurrentView('settings')} icon={<Settings className="w-5 h-5" />} label="Account Settings" isDarkMode={isDarkMode} />
             </nav>
-
             <div className={`relative z-10 p-4 border-t ${isDarkMode ? 'bg-[#05080F] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
               <div className={`flex items-center gap-3 mb-4 p-3 rounded-xl border transition-colors ${isDarkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-white border-slate-200 hover:border-indigo-200'}`}>
                 <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
@@ -396,11 +346,7 @@ export default function App() {
                 </h2>
               </div>
               <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => setIsDarkMode(!isDarkMode)} 
-                  className={`p-2 rounded-full transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}
-                  title="Toggle Theme"
-                >
+                <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-full transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}>
                   {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
                 </button>
                 <div className={`text-xs md:text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
@@ -438,8 +384,9 @@ export default function App() {
                 <PrescriptionView 
                   data={currentPrescription} 
                   doctor={user} 
-                  onBack={() => setCurrentView('dashboard')}
-                  onNew={handleSaveAndNew} 
+                  onBack={() => setCurrentView('dashboard')} // Keep data
+                  onCancel={handleDiscardPrescription}       // Trigger warning and clear data
+                  onNew={handleSaveAndNew}                   // Save to DB and clear
                 />
               )}
             </main>
@@ -450,11 +397,7 @@ export default function App() {
               <NavButtonMobile active={currentView === 'history'} onClick={() => handleNavClick('history')} icon={<History />} label="History" isDarkMode={isDarkMode} />
               <NavButtonMobile active={currentView === 'medicines'} onClick={() => handleNavClick('medicines')} icon={<Pill />} label="Meds List" isDarkMode={isDarkMode} />
               <NavButtonMobile active={currentView === 'settings'} onClick={() => handleNavClick('settings')} icon={<Settings />} label="Account" isDarkMode={isDarkMode} />
-              
-              <button 
-                onClick={handleLogout}
-                className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative text-slate-400 hover:text-rose-500"
-              >
+              <button onClick={handleLogout} className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative text-slate-400 hover:text-rose-500">
                  <LogOut className="w-6 h-6" />
                  <span className="text-[10px] font-bold uppercase tracking-wide">Log Out</span>
               </button>
@@ -576,140 +519,139 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
     <div className="flex h-screen w-full bg-[#0B0F19] font-sans text-slate-900 overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
       
-      <div className="w-full lg:w-1/2 h-full flex flex-col justify-center items-center p-6 md:p-12 relative z-10 overflow-y-auto">
-        {/* LOGIN CARD */}
-        <div className="w-full max-w-md bg-white p-10 rounded-3xl shadow-2xl border-4 border-slate-200/20 animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden ring-1 ring-white/10 mb-6">
-          
-          <div className="text-center mb-8 relative z-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-2xl shadow-lg shadow-indigo-500/30 mb-6 transform transition-transform hover:scale-105 ring-4 ring-white">
-              <Stethoscope className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
-              {isLogin ? 'Welcome Back' : 'Join MediVend'}
-            </h2>
-            <p className="text-slate-500 text-sm">
-              {isLogin ? 'Enter your credentials to access your dashboard.' : 'Start your digital prescription journey today.'}
-            </p>
-          </div>
-
-          {pendingUserEmail && (
-            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-start gap-3 animate-in fade-in">
-              <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold">Account Pending Approval</p>
-                <p className="mt-1 opacity-90">Your account ({pendingUserEmail}) has been created. Please wait for Super Admin verification.</p>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
-            {!isLogin && (
-              <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <div className="relative group">
-                   <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Full Name</label>
-                   <div className="relative">
-                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                       <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                     </div>
-                     <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                   </div>
-                </div>
-                <div className="relative group">
-                   <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Medical License</label>
-                   <div className="relative">
-                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                       <FileBadge className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                     </div>
-                     <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
-                   </div>
-                </div>
-              </div>
-            )}
+      <div className="w-full lg:w-1/2 h-full relative z-10 overflow-y-auto">
+        <div className="min-h-full flex flex-col justify-center items-center p-6 md:p-12">
+          {/* LOGIN CARD */}
+          <div className="w-full max-w-md bg-white p-10 rounded-3xl shadow-2xl border-4 border-slate-200/20 animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden ring-1 ring-white/10 mb-6">
             
-            <div className="relative group">
-               <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Email Address</label>
-               <div className="relative">
-                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                   <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                 </div>
-                 <input required type="email" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-               </div>
+            <div className="text-center mb-8 relative z-10">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-2xl shadow-lg shadow-indigo-500/30 mb-6 transform transition-transform hover:scale-105 ring-4 ring-white">
+                <Stethoscope className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+                {isLogin ? 'Welcome Back' : 'Join MediVend'}
+              </h2>
+              <p className="text-slate-500 text-sm">
+                {isLogin ? 'Enter your credentials to access your dashboard.' : 'Start your digital prescription journey today.'}
+              </p>
             </div>
 
-            <div className="relative group">
-               <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Password</label>
-               <div className="relative">
-                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                   <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                 </div>
-                 <input required type="password" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-               </div>
-            </div>
-
-            {error && (
-              <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 flex items-center gap-2 animate-in slide-in-from-top-2">
-                <AlertCircle className="w-4 h-4" /> {error}
+            {pendingUserEmail && (
+              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-start gap-3 animate-in fade-in">
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">Account Pending Approval</p>
+                  <p className="mt-1 opacity-90">Your account ({pendingUserEmail}) has been created. Please wait for Super Admin verification.</p>
+                </div>
               </div>
             )}
 
-            <button type="submit" disabled={isLoading || lockoutTimer > 0} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] flex justify-center items-center">
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : lockoutTimer > 0 ? (
-                `Try again in ${lockoutTimer}s`
-              ) : (
-                <>
-                  {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4 ml-2" />
-                </>
+            <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+              {!isLogin && (
+                <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="relative group">
+                    <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Full Name</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                      </div>
+                      <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="Dr. John Doe" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                    </div>
+                  </div>
+                  <div className="relative group">
+                    <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Medical License</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <FileBadge className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                      </div>
+                      <input required type="text" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="PRC-XXXXXX" value={formData.license} onChange={e => setFormData({...formData, license: e.target.value})} />
+                    </div>
+                  </div>
+                </div>
               )}
-            </button>
-          </form>
+              
+              <div className="relative group">
+                <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Email Address</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                  </div>
+                  <input required type="email" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="doctor@hospital.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                </div>
+              </div>
 
-          <div className="mt-8 text-center relative z-10">
-            <p className="text-sm text-slate-600">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button 
-                onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); }} 
-                className="ml-2 text-indigo-600 font-bold hover:text-indigo-700 transition-colors hover:underline"
-              >
-                {isLogin ? 'Sign up for free' : 'Log in'}
+              <div className="relative group">
+                <label className="text-xs font-bold text-slate-500 uppercase ml-1 mb-1 block">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                  </div>
+                  <input required type="password" className="w-full pl-10 pr-4 py-3 input-modern rounded-xl outline-none placeholder-slate-400 font-medium" placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+                </div>
+              </div>
+
+              {error && (
+                <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100 flex items-center gap-2 animate-in slide-in-from-top-2">
+                  <AlertCircle className="w-4 h-4" /> {error}
+                </div>
+              )}
+
+              <button type="submit" disabled={isLoading || lockoutTimer > 0} className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 disabled:opacity-70 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] flex justify-center items-center">
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : lockoutTimer > 0 ? (
+                  `Try again in ${lockoutTimer}s`
+                ) : (
+                  <>
+                    {isLogin ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </button>
-            </p>
+            </form>
+
+            <div className="mt-8 text-center relative z-10">
+              <p className="text-sm text-slate-600">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button 
+                  onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); }} 
+                  className="ml-2 text-indigo-600 font-bold hover:text-indigo-700 transition-colors hover:underline"
+                >
+                  {isLogin ? 'Sign up for free' : 'Log in'}
+                </button>
+              </p>
+            </div>
+          </div>
+
+          <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 delay-100">
+            <div className="grid grid-cols-2 gap-3 text-[10px] text-slate-400 bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-md">
+              <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+                <div className="flex items-center gap-2 mb-1 text-indigo-300 font-bold uppercase tracking-wider">
+                  <ShieldCheck className="w-3 h-3"/> App License
+                </div>
+                <p className="font-mono text-slate-300">MV-WEB-2026-001</p>
+              </div>
+              <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+                <div className="flex items-center gap-2 mb-1 text-emerald-300 font-bold uppercase tracking-wider">
+                  <Award className="w-3 h-3"/> FDA License
+                </div>
+                <p className="font-mono text-slate-300">CDRR-NCR-DI-882</p>
+              </div>
+              <div className="col-span-2 p-2 rounded-lg bg-white/5 border border-white/5 flex justify-between items-center">
+                <div className="flex items-center gap-2 text-amber-300 font-bold uppercase tracking-wider">
+                  <HelpCircle className="w-3 h-3"/> Customer Service
+                </div>
+                <p className="font-mono text-slate-300 flex items-center gap-2 font-bold">
+                  <Phone className="w-3 h-3"/> 09273523900
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 text-center text-xs text-slate-500/50">
+              <p>© 2026 MediVend Systems. Secure & Compliant.</p>
+            </div>
           </div>
         </div>
-
-        {/* NEW FOOTER SECTION FOR LICENSES */}
-        <div className="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 delay-100">
-          <div className="grid grid-cols-2 gap-3 text-[10px] text-slate-400 bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-md">
-            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-              <div className="flex items-center gap-2 mb-1 text-indigo-300 font-bold uppercase tracking-wider">
-                 <ShieldCheck className="w-3 h-3"/> App License
-              </div>
-              <p className="font-mono text-slate-300">MV-WEB-2026-001</p>
-            </div>
-            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-              <div className="flex items-center gap-2 mb-1 text-emerald-300 font-bold uppercase tracking-wider">
-                 <Award className="w-3 h-3"/> FDA License
-              </div>
-              <p className="font-mono text-slate-300">CDRR-NCR-DI-882</p>
-            </div>
-            <div className="col-span-2 p-2 rounded-lg bg-white/5 border border-white/5 flex justify-between items-center">
-               <div className="flex items-center gap-2 text-amber-300 font-bold uppercase tracking-wider">
-                 <HelpCircle className="w-3 h-3"/> Customer Service
-               </div>
-               <p className="font-mono text-slate-300 flex items-center gap-2 font-bold">
-                 <Phone className="w-3 h-3"/> 09273523900
-               </p>
-            </div>
-          </div>
-          <div className="mt-4 text-center text-xs text-slate-500/50">
-             <p>© 2026 MediVend Systems. Secure & Compliant.</p>
-          </div>
-        </div>
-
       </div>
 
-      {/* Right Side Hero */}
       <div className="hidden lg:flex w-1/2 bg-[#0B0F19] relative overflow-hidden items-center justify-center border-l border-white/5">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
@@ -726,7 +668,6 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
           </p>
           
           <div className="grid grid-cols-2 gap-4">
-             {/* Feature Cards */}
              <div className="bg-white/5 p-5 rounded-2xl border border-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors duration-300">
                 <Printer className="w-8 h-8 text-emerald-400 mb-3" />
                 <h3 className="font-bold text-white text-sm">Instant Printing</h3>
@@ -1159,7 +1100,7 @@ function Dashboard({
   );
 }
 
-function PrescriptionView({ data, doctor, onBack, onNew }) {
+function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qrValue)}`;
 
   return (
@@ -1173,6 +1114,13 @@ function PrescriptionView({ data, doctor, onBack, onNew }) {
         <div className="flex items-center gap-3 self-end md:self-auto w-full md:w-auto justify-end">
           <div className="text-xs md:text-sm text-slate-500 mr-2 md:mr-4 hidden sm:block">ID: <span className="font-mono font-bold text-slate-800">{data.id}</span></div>
           
+          {/* --- NEW: CANCEL BUTTON (Start Over) --- */}
+          {/* FIXED: Now calls onCancel instead of onBack */}
+          <button onClick={onCancel} className="bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 px-4 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-sm transition-all active:scale-95 text-sm md:text-base whitespace-nowrap">
+             <X className="w-4 h-4" /> Cancel
+          </button>
+
+          {/* --- NEW: SAVE BUTTON (New Rx) --- */}
           <button onClick={onNew} className="bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 px-4 py-2.5 rounded-xl flex items-center gap-2 font-bold shadow-sm transition-all active:scale-95 text-sm md:text-base whitespace-nowrap">
              <Plus className="w-4 h-4" /> New Rx
           </button>
