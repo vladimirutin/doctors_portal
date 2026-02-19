@@ -606,7 +606,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
       </div>
 
       {/* PREVIEW PANE */}
-      <div className={`md:flex flex-col no-print w-full md:w-2/5 md:border-l h-full hidden md:flex ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
+      <div className={`md:flex flex-col no-print w-full md:w-2/5 md:border-l h-full ${mobileView === 'preview' ? 'flex' : 'hidden'} md:flex ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
         <div className={`p-4 md:p-6 border-b ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
           <h3 className={`font-bold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}><FileText className="w-5 h-5 text-indigo-500" /> Live Preview</h3>
         </div>
@@ -1558,8 +1558,8 @@ export default function App() {
 
           {/* MAIN CONTENT AREA */}
           <div className={`flex-1 flex flex-col min-w-0 overflow-hidden relative print:block ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-white'}`}>
-            <header className={`no-print border-b flex items-center justify-between px-4 md:px-8 shadow-md z-20 shrink-0 sticky top-0 transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/5' : 'bg-white border-slate-200'}`}>
-              <div>
+            <header className={`no-print border-b flex items-center justify-between px-4 md:px-8 py-3 md:py-0 shadow-md z-20 shrink-0 sticky top-0 transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/5' : 'bg-white border-slate-200'}`}>
+              <div className="py-4">
                 <h2 className={`text-lg md:text-xl font-bold tracking-tight capitalize flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                   {currentView === 'dashboard' ? <><LayoutDashboard className="w-5 h-5 text-indigo-500"/> Prescription Writer</> : 
                    currentView === 'medicines' ? <><Pill className="w-5 h-5 text-emerald-500"/> Medicine List</> : 
@@ -1569,13 +1569,21 @@ export default function App() {
                    <><Settings className="w-5 h-5 text-slate-400"/> Account Settings</>}
                 </h2>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 sm:gap-4 py-1">
                 <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-full transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}>
                   {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
                 </button>
-                <div className={`text-xs md:text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                <div className={`hidden sm:flex text-xs md:text-sm font-medium items-center gap-2 px-3 py-1.5 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
                   <Clock className="w-3.5 h-3.5 text-indigo-500" /> <span className={isDarkMode ? 'text-slate-200 font-semibold' : 'text-slate-900 font-semibold'}>{new Date().toLocaleDateString()}</span>
                 </div>
+                {/* Profile Avatar inside the header on Mobile to open Settings */}
+                <button 
+                  onClick={() => setCurrentView('settings')} 
+                  className={`md:hidden w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] sm:text-xs shadow-md border-2 transition-all ${currentView === 'settings' ? 'border-indigo-400 bg-indigo-500 ring-2 ring-indigo-500/20' : 'border-transparent bg-indigo-600 hover:bg-indigo-700'}`} 
+                  title="Account Settings"
+                >
+                  {user?.name?.charAt(0) || 'D'}
+                </button>
               </div>
             </header>
 
