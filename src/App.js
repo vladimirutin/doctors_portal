@@ -495,12 +495,15 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
   return (
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden relative bg-transparent">
       <ConfirmationModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={confirmRemoveItem} title="Remove Item?" message="Are you sure you want to remove this medicine from the prescription?" confirmText="Remove" type="danger"/>
+      
+      {/* MOBILE TABS */}
       <div className={`md:hidden no-print flex border-b shrink-0 sticky top-0 z-30 ${isDarkMode ? 'bg-[#1e293b] border-slate-700' : 'bg-white border-slate-200'}`}>
         <button onClick={() => setMobileView('editor')} className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'editor' ? 'text-indigo-500 border-b-2 border-indigo-500 bg-indigo-50/10' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}><LayoutDashboard className="w-4 h-4" /> Editor</button>
         <button onClick={() => setMobileView('preview')} className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${mobileView === 'preview' ? 'text-indigo-500 border-b-2 border-indigo-500 bg-indigo-50/10' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}><Eye className="w-4 h-4" /> Live Preview</button>
       </div>
 
-      <div className={`md:block w-full md:w-3/5 p-4 md:p-8 overflow-y-auto border-r h-full ${mobileView === 'editor' ? 'block' : 'hidden'} ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
+      {/* EDITOR PANE */}
+      <div className={`md:block w-full md:w-3/5 p-4 md:p-8 overflow-y-auto border-r flex-1 min-h-0 ${mobileView === 'editor' ? 'block' : 'hidden'} ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'}`}>
         {broadcast && (
           <div className={`mb-6 p-4 rounded-xl border flex items-start gap-3 shadow-sm animate-in slide-in-from-top-2 ${broadcast.priority === 'high' ? 'bg-red-50 border-red-100 text-red-800' : 'bg-blue-50 border-blue-100 text-blue-800'}`}>
             <Megaphone className={`w-5 h-5 mt-0.5 shrink-0 ${broadcast.priority === 'high' ? 'text-red-600 animate-pulse' : 'text-blue-600'}`} />
@@ -595,7 +598,6 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
                       <div className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>₱{item.totalPrice.toFixed(2)}</div>
                     </div>
                     <button onClick={() => startEditing(item)} className={`p-1.5 sm:p-2 rounded-lg transition-colors ${isDarkMode ? 'text-blue-400 hover:bg-blue-900/20' : 'text-blue-500 hover:bg-blue-50'}`}><Pencil className="w-5 h-5" /></button>
-                    {/* UPDATED: Uses Modal via state */}
                     <button onClick={() => initiateRemoveItem(item.uniqueId)} className={`p-1.5 sm:p-2 rounded-lg transition-colors ${isDarkMode ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-900/20' : 'text-slate-300 hover:text-rose-500 hover:bg-rose-50'}`}><Trash2 className="w-5 h-5" /></button>
                   </div>
                 </div>
@@ -605,9 +607,9 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
         </div>
       </div>
 
-      {/* PREVIEW PANE */}
-      <div className={`md:flex flex-col no-print w-full md:w-2/5 md:border-l h-full ${mobileView === 'preview' ? 'flex' : 'hidden'} md:flex ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
-        <div className={`p-4 md:p-6 border-b ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
+      {/* PREVIEW PANE - Responsive layout thoroughly refined */}
+      <div className={`no-print w-full md:w-2/5 md:border-l flex-col flex-1 min-h-0 ${mobileView === 'preview' ? 'flex' : 'hidden'} md:flex ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
+        <div className={`p-4 md:p-6 border-b shrink-0 ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
           <h3 className={`font-bold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}><FileText className="w-5 h-5 text-indigo-500" /> Live Preview</h3>
         </div>
         <div className={`flex-1 overflow-y-auto p-4 md:p-6 flex justify-center ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-slate-50'}`}>
@@ -650,7 +652,7 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
             </div>
           </div>
         </div>
-        <div className={`p-4 md:p-6 border-t pb-24 md:pb-6 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)] ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
+        <div className={`p-4 md:p-6 border-t shrink-0 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.2)] ${isDarkMode ? 'bg-[#0B0F19] border-slate-700' : 'bg-white border-slate-200'}`}>
           <div className="flex justify-between items-center mb-4">
             <span className="text-slate-400 font-medium text-sm uppercase tracking-wide">Total Estimated Cost</span>
             <span className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>₱{items.reduce((sum, i) => sum + i.totalPrice, 0).toFixed(2)}</span>
@@ -929,7 +931,7 @@ function HistoryView({ user, isDarkMode, hiddenIds, onHide }) {
 
 // ... SettingsView and SupportView remain unchanged ...
 // They are re-included implicitly because I am updating the main App flow
-function SettingsView({ user, onUpdateUser, isDarkMode }) {
+function SettingsView({ user, onUpdateUser, onLogout, isDarkMode }) {
   // ... existing implementation ...
   const [activeTab, setActiveTab] = useState('profile');
   const [isLoading, setIsLoading] = useState(false);
@@ -990,6 +992,14 @@ function SettingsView({ user, onUpdateUser, isDarkMode }) {
              </div>
            )}
         </div>
+        
+        {/* MOBILE LOGOUT BUTTON */}
+        <div className="md:hidden mt-8 pt-6 border-t border-slate-200/50">
+            <button onClick={onLogout} className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm ${isDarkMode ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20' : 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100'}`}>
+                <LogOut className="w-5 h-5" /> Sign Out
+            </button>
+        </div>
+
       </div>
     </div>
   );
@@ -1573,22 +1583,14 @@ export default function App() {
                 <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 rounded-full transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}>
                   {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-500" />}
                 </button>
-                <div className={`hidden sm:flex text-xs md:text-sm font-medium items-center gap-2 px-3 py-1.5 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                <div className={`text-xs md:text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-full border ${isDarkMode ? 'bg-white/5 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
                   <Clock className="w-3.5 h-3.5 text-indigo-500" /> <span className={isDarkMode ? 'text-slate-200 font-semibold' : 'text-slate-900 font-semibold'}>{new Date().toLocaleDateString()}</span>
                 </div>
-                {/* Profile Avatar inside the header on Mobile to open Settings */}
-                <button 
-                  onClick={() => setCurrentView('settings')} 
-                  className={`md:hidden w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-[10px] sm:text-xs shadow-md border-2 transition-all ${currentView === 'settings' ? 'border-indigo-400 bg-indigo-500 ring-2 ring-indigo-500/20' : 'border-transparent bg-indigo-600 hover:bg-indigo-700'}`} 
-                  title="Account Settings"
-                >
-                  {user?.name?.charAt(0) || 'D'}
-                </button>
               </div>
             </header>
 
             {/* VIEWS CONTAINER */}
-            <main className="flex-1 overflow-hidden relative bg-transparent print:bg-white print:overflow-visible pb-20 md:pb-0 print:pb-0">
+            <main className="flex-1 overflow-hidden relative bg-transparent print:bg-white print:overflow-visible pb-[70px] md:pb-0 print:pb-0">
               {currentView === 'dashboard' && (
                 <Dashboard 
                   user={user} 
@@ -1613,7 +1615,7 @@ export default function App() {
                    isDarkMode={isDarkMode}
                 />
               )}
-              {currentView === 'settings' && <SettingsView user={user} onUpdateUser={handleUpdateUser} isDarkMode={isDarkMode} />}
+              {currentView === 'settings' && <SettingsView user={user} onUpdateUser={handleUpdateUser} onLogout={handleLogout} isDarkMode={isDarkMode} />}
               {currentView === 'support' && <SupportView user={user} isDarkMode={isDarkMode} db={db} appId={appId} />}
               {currentView === 'prescription' && (
                 <PrescriptionView 
@@ -1627,15 +1629,12 @@ export default function App() {
             </main>
 
             {/* MOBILE BOTTOM NAVIGATION */}
-            <nav className={`mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 border-t flex justify-around px-2 py-3 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.1)] pb-safe transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
+            <nav className={`mobile-nav-bar md:hidden no-print fixed bottom-0 left-0 right-0 border-t flex justify-around px-2 py-2 z-50 shadow-[0_-4px_20px_-1px_rgba(0,0,0,0.1)] pb-safe transition-colors ${isDarkMode ? 'bg-[#0B0F19] border-white/10' : 'bg-white border-slate-200'}`}>
               <NavButtonMobile active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} icon={<LayoutDashboard />} label="Writer" isDarkMode={isDarkMode} />
               <NavButtonMobile active={currentView === 'history'} onClick={() => handleNavClick('history')} icon={<History />} label="History" isDarkMode={isDarkMode} />
-              <NavButtonMobile active={currentView === 'medicines'} onClick={() => handleNavClick('medicines')} icon={<Pill />} label="Meds List" isDarkMode={isDarkMode} />
+              <NavButtonMobile active={currentView === 'medicines'} onClick={() => handleNavClick('medicines')} icon={<Pill />} label="Meds" isDarkMode={isDarkMode} />
               <NavButtonMobile active={currentView === 'support'} onClick={() => handleNavClick('support')} icon={<LifeBuoy />} label="Support" isDarkMode={isDarkMode} />
-              <button onClick={handleLogout} className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 relative text-slate-400 hover:text-rose-500">
-                  <LogOut className="w-6 h-6" />
-                  <span className="text-[10px] font-bold uppercase tracking-wide">Log Out</span>
-              </button>
+              <NavButtonMobile active={currentView === 'settings'} onClick={() => handleNavClick('settings')} icon={<Settings />} label="Settings" isDarkMode={isDarkMode} />
             </nav>
           </div>
         </div>
