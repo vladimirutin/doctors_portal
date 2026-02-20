@@ -883,6 +883,7 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
           <span className="text-xs text-slate-400 mr-2 hidden sm:block font-mono">ID: <span className="font-black text-slate-700">{data.id}</span></span>
           <button onClick={onCancel} className="px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all active:scale-95"><X className="w-3.5 h-3.5" /> Cancel</button>
           <button onClick={onNew} className="px-4 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all active:scale-95"><Plus className="w-3.5 h-3.5" /> New Rx</button>
+          <button onClick={() => window.print()} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm transition-all active:scale-95"><Download className="w-3.5 h-3.5" /> Download</button>
           <button onClick={() => window.print()} className="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all active:scale-95"><Printer className="w-3.5 h-3.5" /> Print</button>
         </div>
       </div>
