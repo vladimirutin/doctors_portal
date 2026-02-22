@@ -825,8 +825,10 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
               </div>
             </div>
             <div className="absolute bottom-6 left-6 right-6 border-t border-slate-800 pt-3 flex justify-between items-end z-10">
-              <div className="text-[9px] text-slate-400 w-1/2 leading-tight">Digitally verified. Valid at any MediVend Kiosk.</div>
+              <div className="text-[9px] text-slate-400 w-1/2 leading-tight pb-1">Digitally verified. Valid at any MediVend Kiosk.</div>
               <div className="text-center w-36">
+                {/* Space for the physical signature in Live Preview */}
+                <div className="h-10 w-full"></div>
                 <div className="h-[1px] bg-slate-900 w-full mb-1.5" />
                 <p className="font-bold uppercase text-slate-900 text-[10px]">{user?.name}</p>
                 <p className="text-[9px] text-slate-500 uppercase tracking-widest">Lic: {user?.license}</p>
@@ -939,8 +941,10 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
             </div>
           </div>
           <div className="printable-footer flex justify-between items-end bg-white relative z-10 mt-10 pt-6 border-t-2 border-slate-900">
-            <div className="text-[10px] text-slate-400 w-1/2 leading-snug italic print:text-[8px]">Digitally signed. Valid at any MediVend Kiosk or licensed pharmacy.</div>
-            <div className="text-center w-64">
+            <div className="text-[10px] text-slate-400 w-1/2 leading-snug italic print:text-[8px] pb-1">Digitally signed. Valid at any MediVend Kiosk or licensed pharmacy.</div>
+            <div className="text-center w-64 print:w-56">
+              {/* Added explicit height block to carve out whitespace for pen signature */}
+              <div className="h-16 print:h-16 w-full"></div>
               <div className="h-[2px] bg-slate-900 w-full mb-2 print:mb-1" />
               <p className="font-bold uppercase text-sm text-slate-900 tracking-tight print:text-xs">{doctor?.name}</p>
               <p className="text-[9px] uppercase text-slate-500 font-black tracking-widest print:text-[7px]">Lic No: {doctor?.license}</p>
