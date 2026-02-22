@@ -888,11 +888,11 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center print:p-0 print:block">
-        <div className="printable-wrapper bg-white w-full max-w-2xl shadow-2xl p-8 md:p-12 relative text-slate-900 border border-slate-100" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="printable-wrapper flex flex-col min-h-[700px] bg-white w-full max-w-2xl shadow-2xl p-8 md:p-12 relative text-slate-900 border border-slate-100" style={{ fontFamily: 'Georgia, serif' }}>
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
             <span className="rx-watermark text-[10rem] font-black text-slate-200 italic select-none">Rx</span>
           </div>
-          <div className="printable-content relative z-10">
+          <div className="printable-content flex-1 relative z-10">
             <div className="border-b-4 border-slate-900 pb-6 mb-8 print:pb-3 print:mb-4 flex justify-between items-start">
               <div className="flex-1">
                 <h1 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-slate-900 print:text-xl">{doctor?.clinicDetails?.name || 'Clinic Name'}</h1>
@@ -938,7 +938,7 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
               </table>
             </div>
           </div>
-          <div className="printable-footer bg-white relative z-10">
+          <div className="printable-footer flex justify-between items-end bg-white relative z-10 mt-10 pt-6 border-t-2 border-slate-900">
             <div className="text-[10px] text-slate-400 w-1/2 leading-snug italic print:text-[8px]">Digitally signed. Valid at any MediVend Kiosk or licensed pharmacy.</div>
             <div className="text-center w-64">
               <div className="h-[2px] bg-slate-900 w-full mb-2 print:mb-1" />
@@ -1746,9 +1746,9 @@ export default function App() {
             print-color-adjust: exact !important;
           }
           .printable-wrapper { 
-            display: flex !important; 
-            flex-direction: column !important;
-            min-height: 95vh !important; 
+            display: block !important; 
+            height: auto !important; 
+            min-height: auto !important;
             width: 100% !important; 
             margin: 0 !important; 
             padding: 0 !important; 
@@ -1756,7 +1756,6 @@ export default function App() {
             border: none !important; 
           }
           .printable-content { 
-            flex: 1 0 auto !important; 
             display: block !important; 
             overflow: visible !important; 
           }
@@ -1764,9 +1763,10 @@ export default function App() {
             display: flex !important; 
             justify-content: space-between !important;
             align-items: flex-end !important;
-            margin-top: auto !important; 
+            margin-top: 20px !important; 
             width: 100% !important; 
-            padding-top: 15px !important; 
+            border-top: 2px solid #0f172a !important; 
+            padding-top: 10px !important; 
             page-break-inside: avoid !important; 
           }
           .rx-watermark { 
@@ -1784,19 +1784,19 @@ export default function App() {
           .printable-wrapper h1 { font-size: 14pt !important; margin-bottom: 2px !important; }
           .printable-wrapper p, .printable-wrapper span, .printable-wrapper div { font-size: 8pt !important; line-height: 1.2 !important; }
           .printable-wrapper table { width: 100% !important; border-collapse: collapse !important; }
-          .printable-wrapper table th { font-size: 7pt !important; padding: 4px 2px !important; border-bottom: 2px solid #000 !important; }
-          .printable-wrapper table td { font-size: 8pt !important; padding: 4px 2px !important; border-bottom: 1px solid #f1f5f9 !important; }
+          .printable-wrapper table th { font-size: 7pt !important; padding: 2px 2px !important; border-bottom: 2px solid #000 !important; }
+          .printable-wrapper table td { font-size: 8pt !important; padding: 2px 2px !important; border-bottom: 1px solid #f1f5f9 !important; }
           .printable-wrapper table tr { page-break-inside: avoid !important; }
           
-          .printable-wrapper .text-5xl { font-size: 20pt !important; margin-bottom: 8px !important; font-weight: bold !important; }
+          .printable-wrapper .text-5xl { font-size: 20pt !important; margin-bottom: 4px !important; font-weight: bold !important; }
           .printable-wrapper .text-lg { font-size: 9pt !important; font-weight: bold !important; }
           .printable-wrapper .text-sm { font-size: 8pt !important; }
           .printable-wrapper .text-xs, .printable-wrapper .text-\\[9px\\], .printable-wrapper .text-\\[10px\\] { font-size: 7pt !important; }
           
-          .printable-wrapper .mb-8 { margin-bottom: 10px !important; }
-          .printable-wrapper .pb-6 { padding-bottom: 5px !important; }
-          .printable-wrapper .mt-6 { margin-top: 10px !important; }
-          .printable-wrapper .pt-4 { padding-top: 5px !important; }
+          .printable-wrapper .mb-8 { margin-bottom: 8px !important; }
+          .printable-wrapper .pb-6 { padding-bottom: 4px !important; }
+          .printable-wrapper .mt-6 { margin-top: 8px !important; }
+          .printable-wrapper .pt-4 { padding-top: 4px !important; }
           
           .printable-wrapper img { max-width: 60px !important; max-height: 60px !important; }
           .printable-wrapper .w-20, .printable-wrapper .h-20, .printable-wrapper .w-24, .printable-wrapper .h-24 { width: 60px !important; height: 60px !important; }
