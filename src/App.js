@@ -1733,43 +1733,69 @@ export default function App() {
 
         /* ── Print ── */
         @media print {
-          @page { size: auto; margin: 0; } 
+          @page { size: auto; margin: 10mm; } 
           .no-print, nav, .mobile-nav-bar { display: none !important; }
           body, html, #root { 
             background: white !important; 
             margin: 0 !important; 
             padding: 0 !important; 
-            height: 100vh !important; 
-            width: 100vw !important;
-            overflow: hidden !important; 
+            height: auto !important; 
+            width: 100% !important;
+            overflow: visible !important; 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           .printable-wrapper { 
-            display: flex !important; 
-            flex-direction: column !important; 
-            height: 100vh !important; 
-            width: 100vw !important; 
+            display: block !important; 
+            width: 100% !important; 
             margin: 0 !important; 
-            padding: 10mm 15mm !important; 
+            padding: 0 !important; 
             box-shadow: none !important; 
             border: none !important; 
-            box-sizing: border-box !important;
           }
-          .printable-content { flex: 1 1 auto !important; overflow: hidden !important; }
-          .printable-footer { flex-shrink: 0 !important; margin-top: auto !important; width: 100% !important; border-top: 2px solid #0f172a !important; padding-top: 5px !important; }
-          .rx-watermark { font-size: 10rem !important; color: #94a3b8 !important; opacity: 0.1 !important; position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 0 !important;}
+          .printable-content { 
+            display: block !important; 
+            overflow: visible !important; 
+          }
+          .printable-footer { 
+            display: block !important; 
+            margin-top: 20px !important; 
+            width: 100% !important; 
+            border-top: 2px solid #0f172a !important; 
+            padding-top: 8px !important; 
+            page-break-inside: avoid !important; 
+          }
+          .rx-watermark { 
+            font-size: 12rem !important; 
+            color: #94a3b8 !important; 
+            opacity: 0.1 !important; 
+            position: fixed !important; 
+            top: 50% !important; 
+            left: 50% !important; 
+            transform: translate(-50%, -50%) !important; 
+            z-index: 0 !important;
+          }
           
           /* Typography scaling for all paper sizes */
-          .printable-wrapper h1 { font-size: 16pt !important; margin-bottom: 2px !important; }
-          .printable-wrapper p, .printable-wrapper span { font-size: 8pt !important; line-height: 1.2 !important; }
-          .printable-wrapper table th { font-size: 7pt !important; padding: 2px 1px !important; border-bottom: 1px solid #000 !important; }
-          .printable-wrapper table td { font-size: 9pt !important; padding: 3px 1px !important; border-bottom: 1px solid #f1f5f9 !important; }
-          .printable-wrapper .text-5xl { font-size: 24pt !important; margin-bottom: 8px !important; }
-          .printable-wrapper .text-lg { font-size: 10pt !important; }
+          .printable-wrapper h1 { font-size: 14pt !important; margin-bottom: 2px !important; }
+          .printable-wrapper p, .printable-wrapper span, .printable-wrapper div { font-size: 8pt !important; line-height: 1.2 !important; }
+          .printable-wrapper table { width: 100% !important; border-collapse: collapse !important; }
+          .printable-wrapper table th { font-size: 7pt !important; padding: 4px 2px !important; border-bottom: 2px solid #000 !important; }
+          .printable-wrapper table td { font-size: 8pt !important; padding: 4px 2px !important; border-bottom: 1px solid #f1f5f9 !important; }
+          .printable-wrapper table tr { page-break-inside: avoid !important; }
+          
+          .printable-wrapper .text-5xl { font-size: 20pt !important; margin-bottom: 8px !important; font-weight: bold !important; }
+          .printable-wrapper .text-lg { font-size: 9pt !important; font-weight: bold !important; }
           .printable-wrapper .text-sm { font-size: 8pt !important; }
-          .printable-wrapper .mb-8 { margin-bottom: 12px !important; }
-          .printable-wrapper .pb-6 { padding-bottom: 6px !important; }
-          .printable-wrapper .mt-6 { margin-top: 12px !important; }
-          .printable-wrapper .pt-4 { padding-top: 6px !important; }
+          .printable-wrapper .text-xs, .printable-wrapper .text-\\[9px\\], .printable-wrapper .text-\\[10px\\] { font-size: 7pt !important; }
+          
+          .printable-wrapper .mb-8 { margin-bottom: 10px !important; }
+          .printable-wrapper .pb-6 { padding-bottom: 5px !important; }
+          .printable-wrapper .mt-6 { margin-top: 10px !important; }
+          .printable-wrapper .pt-4 { padding-top: 5px !important; }
+          
+          .printable-wrapper img { max-width: 60px !important; max-height: 60px !important; }
+          .printable-wrapper .w-20, .printable-wrapper .h-20, .printable-wrapper .w-24, .printable-wrapper .h-24 { width: 60px !important; height: 60px !important; }
         }
       `}</style>
 
