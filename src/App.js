@@ -881,10 +881,10 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
         </button>
         <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap gap-y-2">
           <span className="text-xs text-slate-400 mr-2 hidden sm:block font-mono">ID: <span className="font-black text-slate-700">{data.id}</span></span>
-          <button onClick={onCancel} className="px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all active:scale-95"><X className="w-3.5 h-3.5" /> Cancel</button>
-          <button onClick={onNew} className="px-4 py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all active:scale-95"><Plus className="w-3.5 h-3.5" /> New Rx</button>
-          <button onClick={() => window.print()} className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm transition-all active:scale-95"><Download className="w-3.5 h-3.5" /> Download</button>
-          <button onClick={() => window.print()} className="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all active:scale-95"><Printer className="w-3.5 h-3.5" /> Print</button>
+          <button onClick={onCancel} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all active:scale-95"><X className="w-3.5 h-3.5" /> Cancel</button>
+          <button onClick={onNew} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-100 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all active:scale-95"><Plus className="w-3.5 h-3.5" /> New Rx</button>
+          <button onClick={() => window.print()} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm transition-all active:scale-95"><Download className="w-3.5 h-3.5" /> PDF</button>
+          <button onClick={() => window.print()} className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-slate-900 text-white text-xs font-black uppercase tracking-widest flex items-center gap-1.5 hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all active:scale-95"><Printer className="w-3.5 h-3.5" /> Print</button>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center print:p-0 print:block">
@@ -893,45 +893,45 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
             <span className="rx-watermark text-[10rem] font-black text-slate-200 italic select-none">Rx</span>
           </div>
           <div className="printable-content relative z-10">
-            <div className="border-b-4 border-slate-900 pb-6 mb-8 flex justify-between items-start">
+            <div className="border-b-4 border-slate-900 pb-6 mb-8 print:pb-3 print:mb-4 flex justify-between items-start">
               <div className="flex-1">
-                <h1 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-slate-900">{doctor?.clinicDetails?.name || 'Clinic Name'}</h1>
-                <div className="mt-2 text-sm text-slate-600 space-y-0.5" style={{ fontFamily: 'system-ui, sans-serif' }}>
+                <h1 className="text-2xl md:text-3xl font-bold uppercase tracking-widest text-slate-900 print:text-xl">{doctor?.clinicDetails?.name || 'Clinic Name'}</h1>
+                <div className="mt-2 text-sm text-slate-600 space-y-0.5 print:text-xs" style={{ fontFamily: 'system-ui, sans-serif' }}>
                   <p>{doctor?.clinicDetails?.address}</p>
                   <p>Tel: {doctor?.clinicDetails?.contactNumber}</p>
                   <p>PTR: {doctor?.clinicDetails?.ptr}</p>
                 </div>
               </div>
               <div className="text-right ml-4">
-                <div className="w-20 h-20 md:w-24 md:h-24 bg-white border-2 border-slate-900 p-1 inline-block">
+                <div className="w-20 h-20 md:w-24 md:h-24 bg-white border-2 border-slate-900 p-1 inline-block print:w-16 print:h-16">
                   <img src={qrUrl} alt="Rx QR" className="w-full h-full object-cover" />
                 </div>
                 <p className="text-[10px] font-mono mt-1 text-slate-500 font-bold">{data.id}</p>
               </div>
             </div>
-            <div className="mb-8 grid grid-cols-2 gap-y-2 text-sm border-b border-slate-200 pb-6" style={{ fontFamily: 'system-ui, sans-serif' }}>
-              <div><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Patient Name</span><br /><span className="text-lg font-bold">{data.patient.name}</span></div>
-              <div className="text-right"><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Date Issued</span><br /><span className="text-lg font-bold">{data.date}</span></div>
-              <div><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Age / Sex</span><br /><span>{data.patient.age} / {data.patient.sex}</span></div>
-              <div className="text-right"><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Physician</span><br /><span className="uppercase font-bold">{doctor?.name}</span></div>
+            <div className="mb-8 print:mb-4 grid grid-cols-2 gap-y-2 text-sm border-b border-slate-200 pb-6 print:pb-3" style={{ fontFamily: 'system-ui, sans-serif' }}>
+              <div><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Patient Name</span><br /><span className="text-lg font-bold print:text-base">{data.patient.name}</span></div>
+              <div className="text-right"><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Date Issued</span><br /><span className="text-lg font-bold print:text-base">{data.date}</span></div>
+              <div><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Age / Sex</span><br /><span className="print:text-xs">{data.patient.age} / {data.patient.sex}</span></div>
+              <div className="text-right"><span className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Physician</span><br /><span className="uppercase font-bold print:text-xs">{doctor?.name}</span></div>
             </div>
             <div className="min-h-[400px] print-min-h-reset relative">
               <table className="w-full text-left border-collapse" style={{ fontFamily: 'system-ui, sans-serif' }}>
                 <thead>
-                  <tr className="border-b-2 border-slate-900 text-[10px] font-black uppercase text-slate-900 tracking-widest bg-slate-50/50">
-                    <th className="py-2 px-1">Medicine Description</th>
-                    <th className="py-2 px-1 text-center">Dosage</th>
-                    <th className="py-2 px-1 text-center">Qty</th>
-                    <th className="py-2 px-1 text-right">Instructions</th>
+                  <tr className="border-b-2 border-slate-900 text-[10px] font-black uppercase text-slate-900 tracking-widest bg-slate-50/50 print:bg-transparent">
+                    <th className="py-2 px-1 print:py-1">Medicine Description</th>
+                    <th className="py-2 px-1 text-center print:py-1">Dosage</th>
+                    <th className="py-2 px-1 text-center print:py-1">Qty</th>
+                    <th className="py-2 px-1 text-right print:py-1">Instructions</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {data.items.map(item => (
-                    <tr key={item.uniqueId} className="border-b border-slate-100">
-                      <td className="py-4 px-1 align-top font-bold text-lg text-slate-900">{item.name}</td>
-                      <td className="py-4 px-1 align-top text-center text-slate-600">{item.dosage}</td>
-                      <td className="py-4 px-1 align-top text-center font-bold text-lg">#{item.quantity}</td>
-                      <td className="py-4 px-1 align-top text-right italic text-slate-600 max-w-[200px]">{item.instructions}</td>
+                    <tr key={item.uniqueId} className="border-b border-slate-100 print:border-slate-200">
+                      <td className="py-4 px-1 align-top font-bold text-lg text-slate-900 print:py-1.5 print:text-sm">{item.name}</td>
+                      <td className="py-4 px-1 align-top text-center text-slate-600 print:py-1.5 print:text-xs">{item.dosage}</td>
+                      <td className="py-4 px-1 align-top text-center font-bold text-lg print:py-1.5 print:text-sm">#{item.quantity}</td>
+                      <td className="py-4 px-1 align-top text-right italic text-slate-600 max-w-[200px] print:py-1.5 print:text-xs">{item.instructions}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -939,11 +939,11 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
             </div>
           </div>
           <div className="printable-footer flex justify-between items-end bg-white relative z-10">
-            <div className="text-[10px] text-slate-400 w-1/2 leading-snug italic">Digitally signed. Valid at any MediVend Kiosk or licensed pharmacy.</div>
+            <div className="text-[10px] text-slate-400 w-1/2 leading-snug italic print:text-[8px]">Digitally signed. Valid at any MediVend Kiosk or licensed pharmacy.</div>
             <div className="text-center w-64">
-              <div className="h-[2px] bg-slate-900 w-full mb-2" />
-              <p className="font-bold uppercase text-sm text-slate-900 tracking-tight">{doctor?.name}</p>
-              <p className="text-[9px] uppercase text-slate-500 font-black tracking-widest">Lic No: {doctor?.license}</p>
+              <div className="h-[2px] bg-slate-900 w-full mb-2 print:mb-1" />
+              <p className="font-bold uppercase text-sm text-slate-900 tracking-tight print:text-xs">{doctor?.name}</p>
+              <p className="text-[9px] uppercase text-slate-500 font-black tracking-widest print:text-[7px]">Lic No: {doctor?.license}</p>
             </div>
           </div>
         </div>
@@ -1733,14 +1733,43 @@ export default function App() {
 
         /* ── Print ── */
         @media print {
-          @page { size: auto; margin: 0.5in; }
+          @page { size: auto; margin: 0; } 
           .no-print, nav, .mobile-nav-bar { display: none !important; }
-          body, html, #root { background: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
-          .printable-wrapper { display: flex !important; flex-direction: column !important; min-height: 90vh !important; width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
-          .printable-content { flex: 1 0 auto !important; }
-          .printable-footer { flex-shrink: 0 !important; margin-top: auto !important; width: 100% !important; page-break-inside: avoid !important; padding-top: 10px !important; border-top: 1px solid #e2e8f0 !important; }
-          .rx-watermark { font-size: 8rem !important; color: #94a3b8 !important; opacity: 0.3 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          .print-min-h-reset { min-height: auto !important; }
+          body, html, #root { 
+            background: white !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            height: 100vh !important; 
+            width: 100vw !important;
+            overflow: hidden !important; 
+          }
+          .printable-wrapper { 
+            display: flex !important; 
+            flex-direction: column !important; 
+            height: 100vh !important; 
+            width: 100vw !important; 
+            margin: 0 !important; 
+            padding: 10mm 15mm !important; 
+            box-shadow: none !important; 
+            border: none !important; 
+            box-sizing: border-box !important;
+          }
+          .printable-content { flex: 1 1 auto !important; overflow: hidden !important; }
+          .printable-footer { flex-shrink: 0 !important; margin-top: auto !important; width: 100% !important; border-top: 2px solid #0f172a !important; padding-top: 5px !important; }
+          .rx-watermark { font-size: 10rem !important; color: #94a3b8 !important; opacity: 0.1 !important; position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; z-index: 0 !important;}
+          
+          /* Typography scaling for all paper sizes */
+          .printable-wrapper h1 { font-size: 16pt !important; margin-bottom: 2px !important; }
+          .printable-wrapper p, .printable-wrapper span { font-size: 8pt !important; line-height: 1.2 !important; }
+          .printable-wrapper table th { font-size: 7pt !important; padding: 2px 1px !important; border-bottom: 1px solid #000 !important; }
+          .printable-wrapper table td { font-size: 9pt !important; padding: 3px 1px !important; border-bottom: 1px solid #f1f5f9 !important; }
+          .printable-wrapper .text-5xl { font-size: 24pt !important; margin-bottom: 8px !important; }
+          .printable-wrapper .text-lg { font-size: 10pt !important; }
+          .printable-wrapper .text-sm { font-size: 8pt !important; }
+          .printable-wrapper .mb-8 { margin-bottom: 12px !important; }
+          .printable-wrapper .pb-6 { padding-bottom: 6px !important; }
+          .printable-wrapper .mt-6 { margin-top: 12px !important; }
+          .printable-wrapper .pt-4 { padding-top: 6px !important; }
         }
       `}</style>
 
