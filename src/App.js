@@ -938,7 +938,7 @@ function PrescriptionView({ data, doctor, onBack, onNew, onCancel }) {
               </table>
             </div>
           </div>
-          <div className="printable-footer flex justify-between items-end bg-white relative z-10">
+          <div className="printable-footer bg-white relative z-10">
             <div className="text-[10px] text-slate-400 w-1/2 leading-snug italic print:text-[8px]">Digitally signed. Valid at any MediVend Kiosk or licensed pharmacy.</div>
             <div className="text-center w-64">
               <div className="h-[2px] bg-slate-900 w-full mb-2 print:mb-1" />
@@ -1746,7 +1746,9 @@ export default function App() {
             print-color-adjust: exact !important;
           }
           .printable-wrapper { 
-            display: block !important; 
+            display: flex !important; 
+            flex-direction: column !important;
+            min-height: 95vh !important; 
             width: 100% !important; 
             margin: 0 !important; 
             padding: 0 !important; 
@@ -1754,15 +1756,17 @@ export default function App() {
             border: none !important; 
           }
           .printable-content { 
+            flex: 1 0 auto !important; 
             display: block !important; 
             overflow: visible !important; 
           }
           .printable-footer { 
-            display: block !important; 
-            margin-top: 20px !important; 
+            display: flex !important; 
+            justify-content: space-between !important;
+            align-items: flex-end !important;
+            margin-top: auto !important; 
             width: 100% !important; 
-            border-top: 2px solid #0f172a !important; 
-            padding-top: 8px !important; 
+            padding-top: 15px !important; 
             page-break-inside: avoid !important; 
           }
           .rx-watermark { 
