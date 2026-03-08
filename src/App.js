@@ -59,10 +59,10 @@ function NavButton({ active, onClick, icon, label, isDarkMode, badge }) {
     <button
       onClick={(e) => { trigger(e); onClick(); }}
       className={`nav-btn relative flex w-full items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 group overflow-hidden ${active
-          ? 'nav-btn-active text-white shadow-lg'
-          : isDarkMode
-            ? 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.05]'
-            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+        ? 'nav-btn-active text-white shadow-lg'
+        : isDarkMode
+          ? 'text-slate-400 hover:text-slate-100 hover:bg-white/[0.05]'
+          : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
         }`}
     >
       {rippleEls}
@@ -91,8 +91,8 @@ function NavButtonMobile({ active, onClick, icon, label, isDarkMode }) {
     <button
       onClick={(e) => { trigger(e); onClick(); }}
       className={`mobile-nav-btn relative flex flex-col items-center gap-1 py-2 px-3 rounded-2xl transition-all duration-300 overflow-hidden ${active
-          ? 'text-white'
-          : isDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
+        ? 'text-white'
+        : isDarkMode ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
         }`}
     >
       {rippleEls}
@@ -114,8 +114,8 @@ function NavButtonMobile({ active, onClick, icon, label, isDarkMode }) {
 function GlassCard({ children, className = '', isDarkMode, glow, hover }) {
   return (
     <div className={`glass-card rounded-3xl border transition-all duration-300 ${isDarkMode
-        ? `bg-white/[0.03] border-white/[0.07] ${glow ? 'shadow-[0_0_60px_rgba(99,102,241,0.1)]' : ''} ${hover ? 'hover:border-white/[0.12] hover:bg-white/[0.05]' : ''}`
-        : `bg-white border-slate-200 ${glow ? 'shadow-[0_8px_40px_rgba(99,102,241,0.08)]' : 'shadow-sm'} ${hover ? 'hover:border-indigo-200 hover:shadow-md' : ''}`
+      ? `bg-white/[0.03] border-white/[0.07] ${glow ? 'shadow-[0_0_60px_rgba(99,102,241,0.1)]' : ''} ${hover ? 'hover:border-white/[0.12] hover:bg-white/[0.05]' : ''}`
+      : `bg-white border-slate-200 ${glow ? 'shadow-[0_8px_40px_rgba(99,102,241,0.08)]' : 'shadow-sm'} ${hover ? 'hover:border-indigo-200 hover:shadow-md' : ''}`
       } ${className}`}>
       {children}
     </div>
@@ -262,8 +262,8 @@ function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, type = 
       <div className={`modal-card w-full max-w-sm border overflow-hidden ${type === 'danger' ? 'bg-white border-rose-100' : 'bg-white border-indigo-50'}`} style={{ borderRadius: 28 }}>
         <div className="p-8 text-center">
           <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-5 mx-auto ${type === 'danger'
-              ? 'bg-gradient-to-br from-rose-500 to-pink-600 shadow-[0_8px_32px_rgba(244,63,94,0.35)]'
-              : 'bg-gradient-to-br from-indigo-500 to-blue-600 shadow-[0_8px_32px_rgba(99,102,241,0.35)]'
+            ? 'bg-gradient-to-br from-rose-500 to-pink-600 shadow-[0_8px_32px_rgba(244,63,94,0.35)]'
+            : 'bg-gradient-to-br from-indigo-500 to-blue-600 shadow-[0_8px_32px_rgba(99,102,241,0.35)]'
             }`}>
             {type === 'danger' ? <AlertTriangle className="w-7 h-7 text-white" /> : <CheckCircle2 className="w-7 h-7 text-white" />}
           </div>
@@ -657,8 +657,8 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
           <div className="flex justify-between items-center mb-5">
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${editingId
-                  ? (isDarkMode ? 'bg-blue-500/15 border-blue-500/25' : 'bg-blue-50 border-blue-200')
-                  : (isDarkMode ? 'bg-emerald-500/15 border-emerald-500/25' : 'bg-emerald-50 border-emerald-200')
+                ? (isDarkMode ? 'bg-blue-500/15 border-blue-500/25' : 'bg-blue-50 border-blue-200')
+                : (isDarkMode ? 'bg-emerald-500/15 border-emerald-500/25' : 'bg-emerald-50 border-emerald-200')
                 }`}>
                 {editingId ? <Pencil className="w-4 h-4 text-blue-400" /> : <Pill className="w-4 h-4 text-emerald-400" />}
               </div>
@@ -675,8 +675,8 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
 
           {/* Search area */}
           <div className={`p-5 rounded-2xl border mb-5 transition-all duration-300 ${editingId
-              ? (isDarkMode ? 'border-blue-500/30 bg-blue-500/[0.05]' : 'border-blue-200 bg-blue-50/40')
-              : (isDarkMode ? 'border-white/[0.05] bg-white/[0.02]' : 'border-slate-200/70 bg-slate-50/50')
+            ? (isDarkMode ? 'border-blue-500/30 bg-blue-500/[0.05]' : 'border-blue-200 bg-blue-50/40')
+            : (isDarkMode ? 'border-white/[0.05] bg-white/[0.02]' : 'border-slate-200/70 bg-slate-50/50')
             }`}>
             <div className="grid grid-cols-12 gap-3">
               <div className="col-span-12 md:col-span-8 relative">
@@ -745,8 +745,8 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
               </div>
             ) : items.map((item, index) => (
               <div key={item.uniqueId} className={`rx-item flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 group ${editingId === item.uniqueId
-                  ? (isDarkMode ? 'border-blue-500/40 bg-blue-500/[0.07]' : 'border-blue-300 bg-blue-50')
-                  : (isDarkMode ? 'border-white/[0.06] bg-white/[0.02] hover:border-indigo-500/30 hover:bg-indigo-500/[0.04]' : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-50/80')
+                ? (isDarkMode ? 'border-blue-500/40 bg-blue-500/[0.07]' : 'border-blue-300 bg-blue-50')
+                : (isDarkMode ? 'border-white/[0.06] bg-white/[0.02] hover:border-indigo-500/30 hover:bg-indigo-500/[0.04]' : 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-50/80')
                 }`}>
                 <div className="flex items-center gap-3.5 min-w-0">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm border shrink-0 transition-all duration-200 ${isDarkMode ? 'bg-white/[0.04] border-white/[0.07] text-slate-500 group-hover:bg-indigo-500/15 group-hover:text-indigo-400 group-hover:border-indigo-500/25' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600'
@@ -1201,8 +1201,8 @@ function SettingsView({ user, onUpdateUser, onLogout, isDarkMode }) {
         <div className="flex gap-2 mb-5 overflow-x-auto pb-1 no-scrollbar">
           {tabs.map(({ id, icon: Icon, label }) => (
             <button key={id} onClick={() => setActiveTab(id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === id
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                : isDarkMode ? 'bg-white/[0.04] text-slate-400 border border-white/[0.07] hover:bg-white/[0.08]' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+              : isDarkMode ? 'bg-white/[0.04] text-slate-400 border border-white/[0.07] hover:bg-white/[0.08]' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50'
               }`}>
               <Icon className="w-3.5 h-3.5" /> {label}
             </button>
@@ -1464,7 +1464,14 @@ export default function App() {
   const [masterMedicines, setMasterMedicines] = useState([]);
   const [hiddenMasterIds, setHiddenMasterIds] = useState([]);
   const [hiddenHistoryIds, setHiddenHistoryIds] = useState([]);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('medivend_theme');
+    return saved !== null ? saved === 'dark' : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('medivend_theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
   const [patient, setPatient] = useState({ name: '', age: '', sex: 'Male' });
   const [items, setItems] = useState([]);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
