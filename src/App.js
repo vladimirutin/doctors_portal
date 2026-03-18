@@ -295,6 +295,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockoutTimer, setLockoutTimer] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotModal, setShowForgotModal] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setTimeout(() => setMounted(true), 50); }, []);
@@ -345,6 +346,28 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   return (
     <div className="flex h-screen w-full bg-[#0B0F19] overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
+
+      {showForgotModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-lg p-4">
+          <div className="auth-card bg-[#0d1220] w-full max-w-sm border border-white/[0.08] overflow-hidden" style={{ borderRadius: 28 }}>
+            <div className="p-8 text-center relative">
+              <div className="auth-card-glow" />
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 mx-auto bg-gradient-to-br from-indigo-500 to-blue-600 shadow-[0_8px_32px_rgba(99,102,241,0.35)]">
+                  <HelpCircle className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-black text-white mb-2">Forgot Password?</h3>
+                <p className="text-sm text-slate-400 leading-relaxed mb-6">
+                  For security reasons, please contact our customer service department at <span className="text-cyan-400 font-bold whitespace-nowrap">09273523900</span> for further assistance.
+                </p>
+                <PrimaryButton type="button" onClick={() => setShowForgotModal(false)} className="w-full justify-center py-3.5" variant="indigo">
+                  Got it
+                </PrimaryButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* LEFT: Form */}
       <div className={`auth-panel-left w-full lg:w-[480px] h-full relative z-10 overflow-y-auto flex flex-col items-center justify-center p-6 lg:p-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
@@ -405,6 +428,14 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </Field>
+
+                {isLogin && (
+                  <div className="flex justify-end -mt-1 mb-2">
+                    <button type="button" onClick={() => setShowForgotModal(true)} className="text-[11px] text-slate-400 hover:text-indigo-400 transition-colors font-medium">
+                      Forgot Password?
+                    </button>
+                  </div>
+                )}
 
                 {error && (
                   <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-center gap-2">
