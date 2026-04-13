@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  User, Lock, Stethoscope, Plus, Trash2, Printer, LayoutDashboard, Clock, History, Settings, Pill, Save, X, Building, Phone, MapPin, FileBadge, Search, AlertCircle, FileText, LogOut, ShieldCheck, ChevronRight, Activity, QrCode, CheckCircle2, Mail, Eye, EyeOff, Key, ArrowRight, Award, HelpCircle, Sun, Moon, Pencil, Download, Megaphone, AlertTriangle, LifeBuoy, Globe, Database
+  User, Lock, Stethoscope, Plus, Trash2, Printer, LayoutDashboard, Clock, History, Settings, Pill, Save, X, Building, Phone, MapPin, FileBadge, Search, AlertCircle, FileText, LogOut, ShieldCheck, ChevronRight, Activity, QrCode, CheckCircle2, Mail, Eye, EyeOff, Key, ArrowRight, Award, HelpCircle, Sun, Moon, Pencil, Download, Megaphone, AlertTriangle, LifeBuoy, Globe, Database, Camera, Image as ImageIcon
 } from 'lucide-react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, serverTimestamp, getDocs, query, where, limit, onSnapshot, addDoc, deleteDoc } from "firebase/firestore";
@@ -286,9 +286,34 @@ function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, type = 
 // ═══════════════════════════════════════════════════════════════
 // AUTH SCREEN
 // ═══════════════════════════════════════════════════════════════
+// ── Compress image to base64 ──
+function compressImage(file, maxWidth = 800, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxWidth) { h = (maxWidth / w) * h; w = maxWidth; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function AuthScreen({ onAuthSuccess, db, appId }) {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', license: '' });
+  const [licenseImage, setLicenseImage] = useState(null);
+  const [licensePreview, setLicensePreview] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [pendingUserEmail, setPendingUserEmail] = useState(null);
@@ -297,6 +322,28 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleLicenseImageSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file (JPG, PNG, etc.)');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Image must be less than 10MB.');
+      return;
+    }
+    try {
+      const compressed = await compressImage(file);
+      setLicenseImage(compressed);
+      setLicensePreview(compressed);
+      setError('');
+    } catch {
+      setError('Failed to process image. Try again.');
+    }
+  };
 
   useEffect(() => { setTimeout(() => setMounted(true), 50); }, []);
 
@@ -332,11 +379,13 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
           }
         } else { setError(`No account found.`); }
       } else {
+        if (!licenseImage) { setError('Please upload a clear photo of your PRC License ID.'); setIsLoading(false); return; }
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) { setError("Account already exists. Please log in."); }
         else {
-          await setDoc(docRef, { name: formData.name, email: emailId, password: formData.password, license: formData.license, status: 'pending', clinicDetails: null, createdAt: serverTimestamp() });
+          await setDoc(docRef, { name: formData.name, email: emailId, password: formData.password, license: formData.license, licenseImage: licenseImage, status: 'pending', clinicDetails: null, createdAt: serverTimestamp() });
           setPendingUserEmail(emailId); setIsLogin(true);
+          setLicenseImage(null); setLicensePreview(null);
         }
       }
     } catch (err) { setError("Connection error. Check your internet connection."); }
@@ -417,6 +466,36 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                     <Field label="PRC License No." icon={FileBadge} isDarkMode>
                       <input required type="text" className={inputClass(true)} placeholder="PRCL-XXXXXX" value={formData.license} onChange={e => setFormData({ ...formData, license: e.target.value })} />
                     </Field>
+                    {/* License Photo Upload */}
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">PRC License ID Photo <span className="text-rose-400">*</span></label>
+                      <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handleLicenseImageSelect} className="hidden" />
+                      {licensePreview ? (
+                        <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
+                          <img src={licensePreview} alt="License Preview" className="w-full h-40 object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3">
+                            <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
+                              <Camera className="w-3.5 h-3.5" /> Retake
+                            </button>
+                            <button type="button" onClick={() => { setLicenseImage(null); setLicensePreview(null); }} className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
+                              <X className="w-3.5 h-3.5" /> Remove
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-emerald-500/90 text-white text-[9px] font-bold rounded-lg flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> Uploaded
+                          </div>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => fileInputRef.current?.click()}
+                          className="w-full py-8 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-indigo-500/40 bg-white/[0.02] hover:bg-indigo-500/[0.05] transition-all flex flex-col items-center gap-2 group cursor-pointer">
+                          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Camera className="w-6 h-6 text-indigo-400" />
+                          </div>
+                          <p className="text-sm font-bold text-slate-400 group-hover:text-indigo-300 transition-colors">Upload License Photo</p>
+                          <p className="text-[10px] text-slate-600">Tap to take a photo or select from gallery</p>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
                 <Field label="Email Address" icon={Mail} isDarkMode>
@@ -452,7 +531,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                 <p className="text-sm text-slate-600">
                   {isLogin ? "New to MediVend?" : "Already have an account?"}
                   <button
-                    onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); }}
+                    onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); setLicenseImage(null); setLicensePreview(null); }}
                     className="ml-2 text-indigo-400 font-bold hover:text-cyan-300 transition-colors"
                   >
                     {isLogin ? 'Create account' : 'Sign in'}
