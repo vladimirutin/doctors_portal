@@ -314,6 +314,8 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', license: '' });
   const [licenseImage, setLicenseImage] = useState(null);
   const [licensePreview, setLicensePreview] = useState(null);
+  const [selfieImage, setSelfieImage] = useState(null);
+  const [selfiePreview, setSelfiePreview] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [pendingUserEmail, setPendingUserEmail] = useState(null);
@@ -323,8 +325,9 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef(null);
+  const selfieInputRef = useRef(null);
 
-  const handleLicenseImageSelect = async (e) => {
+  const handleImageSelect = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -337,8 +340,13 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
     }
     try {
       const compressed = await compressImage(file);
-      setLicenseImage(compressed);
-      setLicensePreview(compressed);
+      if (type === 'license') {
+        setLicenseImage(compressed);
+        setLicensePreview(compressed);
+      } else {
+        setSelfieImage(compressed);
+        setSelfiePreview(compressed);
+      }
       setError('');
     } catch {
       setError('Failed to process image. Try again.');
@@ -380,12 +388,13 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
         } else { setError(`No account found.`); }
       } else {
         if (!licenseImage) { setError('Please upload a clear photo of your PRC License ID.'); setIsLoading(false); return; }
+        if (!selfieImage) { setError('Please upload a selfie photo of yourself.'); setIsLoading(false); return; }
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) { setError("Account already exists. Please log in."); }
         else {
-          await setDoc(docRef, { name: formData.name, email: emailId, password: formData.password, license: formData.license, licenseImage: licenseImage, status: 'pending', clinicDetails: null, createdAt: serverTimestamp() });
+          await setDoc(docRef, { name: formData.name, email: emailId, password: formData.password, license: formData.license, licenseImage: licenseImage, selfieImage: selfieImage, status: 'pending', clinicDetails: null, createdAt: serverTimestamp() });
           setPendingUserEmail(emailId); setIsLogin(true);
-          setLicenseImage(null); setLicensePreview(null);
+          setLicenseImage(null); setLicensePreview(null); setSelfieImage(null); setSelfiePreview(null);
         }
       }
     } catch (err) { setError("Connection error. Check your internet connection."); }
@@ -469,7 +478,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                     {/* License Photo Upload */}
                     <div>
                       <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">PRC License ID Photo <span className="text-rose-400">*</span></label>
-                      <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handleLicenseImageSelect} className="hidden" />
+                      <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleImageSelect(e, 'license')} className="hidden" />
                       {licensePreview ? (
                         <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
                           <img src={licensePreview} alt="License Preview" className="w-full h-40 object-cover" />
@@ -487,12 +496,42 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                         </div>
                       ) : (
                         <button type="button" onClick={() => fileInputRef.current?.click()}
-                          className="w-full py-8 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-indigo-500/40 bg-white/[0.02] hover:bg-indigo-500/[0.05] transition-all flex flex-col items-center gap-2 group cursor-pointer">
-                          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Camera className="w-6 h-6 text-indigo-400" />
+                          className="w-full py-6 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-indigo-500/40 bg-white/[0.02] hover:bg-indigo-500/[0.05] transition-all flex flex-col items-center gap-2 group cursor-pointer">
+                          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Camera className="w-5 h-5 text-indigo-400" />
                           </div>
                           <p className="text-sm font-bold text-slate-400 group-hover:text-indigo-300 transition-colors">Upload License Photo</p>
-                          <p className="text-[10px] text-slate-600">Tap to take a photo or select from gallery</p>
+                          <p className="text-[10px] text-slate-600">Take a photo of your PRC License ID</p>
+                        </button>
+                      )}
+                    </div>
+                    {/* Selfie Photo Upload */}
+                    <div>
+                      <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">Your Selfie Photo <span className="text-rose-400">*</span></label>
+                      <input ref={selfieInputRef} type="file" accept="image/*" capture="user" onChange={(e) => handleImageSelect(e, 'selfie')} className="hidden" />
+                      {selfiePreview ? (
+                        <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
+                          <img src={selfiePreview} alt="Selfie Preview" className="w-full h-40 object-cover" />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3">
+                            <button type="button" onClick={() => selfieInputRef.current?.click()} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
+                              <Camera className="w-3.5 h-3.5" /> Retake
+                            </button>
+                            <button type="button" onClick={() => { setSelfieImage(null); setSelfiePreview(null); }} className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
+                              <X className="w-3.5 h-3.5" /> Remove
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-emerald-500/90 text-white text-[9px] font-bold rounded-lg flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" /> Uploaded
+                          </div>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => selfieInputRef.current?.click()}
+                          className="w-full py-6 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-cyan-500/40 bg-white/[0.02] hover:bg-cyan-500/[0.05] transition-all flex flex-col items-center gap-2 group cursor-pointer">
+                          <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <User className="w-5 h-5 text-cyan-400" />
+                          </div>
+                          <p className="text-sm font-bold text-slate-400 group-hover:text-cyan-300 transition-colors">Upload Your Selfie</p>
+                          <p className="text-[10px] text-slate-600">Take a clear front-facing photo of yourself</p>
                         </button>
                       )}
                     </div>
@@ -531,7 +570,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                 <p className="text-sm text-slate-600">
                   {isLogin ? "New to MediVend?" : "Already have an account?"}
                   <button
-                    onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); setLicenseImage(null); setLicensePreview(null); }}
+                    onClick={() => { setIsLogin(!isLogin); setError(''); setPendingUserEmail(null); setFormData({ name: '', email: '', password: '', license: '' }); setLicenseImage(null); setLicensePreview(null); setSelfieImage(null); setSelfiePreview(null); }}
                     className="ml-2 text-indigo-400 font-bold hover:text-cyan-300 transition-colors"
                   >
                     {isLogin ? 'Create account' : 'Sign in'}
