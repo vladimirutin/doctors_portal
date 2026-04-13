@@ -402,7 +402,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   };
 
   return (
-    <div className="flex h-screen w-full bg-[#0B0F19] overflow-hidden relative">
+    <div className="flex min-h-screen w-full bg-[#0B0F19] overflow-y-auto relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
 
       {showForgotModal && (
@@ -428,7 +428,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
       )}
 
       {/* LEFT: Form */}
-      <div className={`auth-panel-left w-full lg:w-[480px] h-full relative z-10 overflow-y-auto flex flex-col items-center justify-center p-6 lg:p-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+      <div className={`auth-panel-left w-full lg:w-[480px] min-h-full relative z-10 flex flex-col items-center justify-start lg:justify-center py-10 px-6 lg:p-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
         {/* Logo */}
         <div className="w-full max-w-sm mb-8">
           <div className="flex items-center gap-3">
