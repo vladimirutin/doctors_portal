@@ -428,9 +428,9 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
       )}
 
       {/* LEFT: Form */}
-      <div className={`auth-panel-left w-full lg:w-[480px] min-h-full relative z-10 flex flex-col items-center justify-start lg:justify-center py-10 px-6 lg:p-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
+      <div className={`auth-panel-left w-full lg:w-[560px] min-h-full relative z-10 flex flex-col items-center justify-start lg:justify-center py-10 px-6 lg:p-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
         {/* Logo */}
-        <div className="w-full max-w-sm mb-8">
+        <div className="w-full max-w-md mb-8">
           <div className="flex items-center gap-3">
             <div className="logo-icon relative">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-blue-700 flex items-center justify-center shadow-[0_8px_32px_rgba(99,102,241,0.45)]">
@@ -445,7 +445,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
           </div>
         </div>
 
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-md">
           <div className="auth-card rounded-3xl border border-white/[0.08] p-8 shadow-2xl overflow-hidden">
             <div className="auth-card-glow" />
             <div className="relative z-10">
@@ -475,65 +475,65 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                     <Field label="PRC License No." icon={FileBadge} isDarkMode>
                       <input required type="text" className={inputClass(true)} placeholder="PRCL-XXXXXX" value={formData.license} onChange={e => setFormData({ ...formData, license: e.target.value })} />
                     </Field>
-                    {/* License Photo Upload */}
-                    <div>
-                      <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">PRC License ID Photo <span className="text-rose-400">*</span></label>
-                      <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleImageSelect(e, 'license')} className="hidden" />
-                      {licensePreview ? (
-                        <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
-                          <img src={licensePreview} alt="License Preview" className="w-full h-40 object-cover" />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3">
-                            <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
-                              <Camera className="w-3.5 h-3.5" /> Retake
-                            </button>
-                            <button type="button" onClick={() => { setLicenseImage(null); setLicensePreview(null); }} className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
-                              <X className="w-3.5 h-3.5" /> Remove
-                            </button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* License Photo Upload */}
+                      <div>
+                        <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">PRC License <span className="text-rose-400">*</span></label>
+                        <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleImageSelect(e, 'license')} className="hidden" />
+                        {licensePreview ? (
+                          <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
+                            <img src={licensePreview} alt="License Preview" className="w-full h-32 object-cover" />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2">
+                              <button type="button" onClick={() => fileInputRef.current?.click()} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
+                                <Camera className="w-3 h-3" /> Retake
+                              </button>
+                              <button type="button" onClick={() => { setLicenseImage(null); setLicensePreview(null); }} className="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
+                                <X className="w-3 h-3" /> Remove
+                              </button>
+                            </div>
+                            <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-emerald-500/90 text-white text-[8px] font-bold rounded flex items-center gap-1">
+                              <CheckCircle2 className="w-2.5 h-2.5" /> Done
+                            </div>
                           </div>
-                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-emerald-500/90 text-white text-[9px] font-bold rounded-lg flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" /> Uploaded
+                        ) : (
+                          <button type="button" onClick={() => fileInputRef.current?.click()}
+                            className="w-full py-4 px-2 h-32 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-indigo-500/40 bg-white/[0.02] hover:bg-indigo-500/[0.05] transition-all flex flex-col items-center justify-center gap-1.5 group cursor-pointer">
+                            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Camera className="w-4 h-4 text-indigo-400" />
+                            </div>
+                            <p className="text-xs font-bold text-slate-400 group-hover:text-indigo-300 transition-colors text-center">PRC Photo</p>
+                          </button>
+                        )}
+                      </div>
+                      {/* Selfie Photo Upload */}
+                      <div>
+                        <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">Your Selfie <span className="text-rose-400">*</span></label>
+                        <input ref={selfieInputRef} type="file" accept="image/*" capture="user" onChange={(e) => handleImageSelect(e, 'selfie')} className="hidden" />
+                        {selfiePreview ? (
+                          <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
+                            <img src={selfiePreview} alt="Selfie Preview" className="w-full h-32 object-cover" />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2">
+                              <button type="button" onClick={() => selfieInputRef.current?.click()} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
+                                <Camera className="w-3 h-3" /> Retake
+                              </button>
+                              <button type="button" onClick={() => { setSelfieImage(null); setSelfiePreview(null); }} className="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
+                                <X className="w-3 h-3" /> Remove
+                              </button>
+                            </div>
+                            <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-emerald-500/90 text-white text-[8px] font-bold rounded flex items-center gap-1">
+                              <CheckCircle2 className="w-2.5 h-2.5" /> Done
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <button type="button" onClick={() => fileInputRef.current?.click()}
-                          className="w-full py-6 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-indigo-500/40 bg-white/[0.02] hover:bg-indigo-500/[0.05] transition-all flex flex-col items-center gap-2 group cursor-pointer">
-                          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Camera className="w-5 h-5 text-indigo-400" />
-                          </div>
-                          <p className="text-sm font-bold text-slate-400 group-hover:text-indigo-300 transition-colors">Upload License Photo</p>
-                          <p className="text-[10px] text-slate-600">Take a photo of your PRC License ID</p>
-                        </button>
-                      )}
-                    </div>
-                    {/* Selfie Photo Upload */}
-                    <div>
-                      <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">Your Selfie Photo <span className="text-rose-400">*</span></label>
-                      <input ref={selfieInputRef} type="file" accept="image/*" capture="user" onChange={(e) => handleImageSelect(e, 'selfie')} className="hidden" />
-                      {selfiePreview ? (
-                        <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
-                          <img src={selfiePreview} alt="Selfie Preview" className="w-full h-40 object-cover" />
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3">
-                            <button type="button" onClick={() => selfieInputRef.current?.click()} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
-                              <Camera className="w-3.5 h-3.5" /> Retake
-                            </button>
-                            <button type="button" onClick={() => { setSelfieImage(null); setSelfiePreview(null); }} className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
-                              <X className="w-3.5 h-3.5" /> Remove
-                            </button>
-                          </div>
-                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-emerald-500/90 text-white text-[9px] font-bold rounded-lg flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" /> Uploaded
-                          </div>
-                        </div>
-                      ) : (
-                        <button type="button" onClick={() => selfieInputRef.current?.click()}
-                          className="w-full py-6 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-cyan-500/40 bg-white/[0.02] hover:bg-cyan-500/[0.05] transition-all flex flex-col items-center gap-2 group cursor-pointer">
-                          <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <User className="w-5 h-5 text-cyan-400" />
-                          </div>
-                          <p className="text-sm font-bold text-slate-400 group-hover:text-cyan-300 transition-colors">Upload Your Selfie</p>
-                          <p className="text-[10px] text-slate-600">Take a clear front-facing photo of yourself</p>
-                        </button>
-                      )}
+                        ) : (
+                          <button type="button" onClick={() => selfieInputRef.current?.click()}
+                            className="w-full py-4 px-2 h-32 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-cyan-500/40 bg-white/[0.02] hover:bg-cyan-500/[0.05] transition-all flex flex-col items-center justify-center gap-1.5 group cursor-pointer">
+                            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <User className="w-4 h-4 text-cyan-400" />
+                            </div>
+                            <p className="text-xs font-bold text-slate-400 group-hover:text-cyan-300 transition-colors text-center">Owner Selfie</p>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -600,9 +600,15 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
 
       {/* RIGHT: Hero */}
       <div className={`hidden lg:flex flex-1 relative overflow-hidden flex-col items-center justify-center p-12 transition-all duration-700 delay-200 border-l border-white/5 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
-        <div className="absolute inset-0 bg-[#0B0F19]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        {/* Background layers */}
+        <div className="absolute inset-0 bg-[#0B0F19]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/30 via-[#0B0F19] to-black opacity-90" />
+        {/* Layer 1: Hexagonal Grid (Indigo Tint) */}
+        <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16l28-16 28 16v34L28 66zm0 34L0 84V50l28-16 28 16v34L28 100z' fill='none' stroke='%236366f1' stroke-width='0.5' stroke-opacity='0.12'/%3E%3C/svg%3E\")" }} />
+        {/* Layer 2: Hex grid edge fade */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #0B0F19 75%)' }} />
+        {/* Layer 3: Constellation particles (Indigo/Cyan Tint) */}
+        <div className="absolute inset-0 opacity-80" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='80' r='1.5' fill='%236366f1' opacity='0.6'/%3E%3Ccircle cx='150' cy='40' r='1' fill='%2394a3b8' opacity='0.4'/%3E%3Ccircle cx='250' cy='100' r='1.8' fill='%236366f1' opacity='0.5'/%3E%3Ccircle cx='350' cy='60' r='1' fill='%2394a3b8' opacity='0.3'/%3E%3Ccircle cx='100' cy='180' r='1.2' fill='%2306b6d4' opacity='0.5'/%3E%3Ccircle cx='200' cy='200' r='2' fill='%236366f1' opacity='0.4'/%3E%3Ccircle cx='300' cy='150' r='1' fill='%2394a3b8' opacity='0.3'/%3E%3Ccircle cx='80' cy='300' r='1.5' fill='%2394a3b8' opacity='0.4'/%3E%3Ccircle cx='180' cy='330' r='1' fill='%236366f1' opacity='0.5'/%3E%3Ccircle cx='320' cy='280' r='1.8' fill='%2306b6d4' opacity='0.4'/%3E%3Ccircle cx='380' cy='350' r='1' fill='%2394a3b8' opacity='0.3'/%3E%3Ccircle cx='30' cy='370' r='1.2' fill='%236366f1' opacity='0.4'/%3E%3Cline x1='50' y1='80' x2='150' y2='40' stroke='%236366f1' stroke-width='0.3' opacity='0.15'/%3E%3Cline x1='150' y1='40' x2='250' y2='100' stroke='%2394a3b8' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='250' y1='100' x2='350' y2='60' stroke='%236366f1' stroke-width='0.3' opacity='0.12'/%3E%3Cline x1='100' y1='180' x2='200' y2='200' stroke='%2306b6d4' stroke-width='0.3' opacity='0.12'/%3E%3Cline x1='200' y1='200' x2='300' y2='150' stroke='%2394a3b8' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='50' y1='80' x2='100' y2='180' stroke='%2394a3b8' stroke-width='0.3' opacity='0.08'/%3E%3Cline x1='250' y1='100' x2='200' y2='200' stroke='%236366f1' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='80' y1='300' x2='180' y2='330' stroke='%236366f1' stroke-width='0.3' opacity='0.12'/%3E%3Cline x1='320' y1='280' x2='380' y2='350' stroke='%2306b6d4' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='300' y1='150' x2='320' y2='280' stroke='%2394a3b8' stroke-width='0.3' opacity='0.08'/%3E%3Cline x1='180' y1='330' x2='320' y2='280' stroke='%236366f1' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='30' y1='370' x2='80' y2='300' stroke='%2394a3b8' stroke-width='0.3' opacity='0.1'/%3E%3C/svg%3E\")" }} />
         <div className="relative z-10 max-w-xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/8 text-indigo-300 text-xs font-bold uppercase tracking-[0.15em] mb-10">
             <Activity className="w-3.5 h-3.5 animate-pulse" /> Professional Healthcare Suite
@@ -643,8 +649,15 @@ function OnboardingScreen({ onComplete, user }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative bg-[#0B0F19] overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+        {/* Background layers */}
+        <div className="absolute inset-0 bg-[#0B0F19]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/30 via-[#0B0F19] to-black opacity-90" />
+        {/* Layer 1: Hexagonal Grid (Indigo Tint) */}
+        <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16l28-16 28 16v34L28 66zm0 34L0 84V50l28-16 28 16v34L28 100z' fill='none' stroke='%236366f1' stroke-width='0.5' stroke-opacity='0.12'/%3E%3C/svg%3E\")" }} />
+        {/* Layer 2: Hex grid edge fade */}
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #0B0F19 75%)' }} />
+        {/* Layer 3: Constellation particles (Indigo/Cyan Tint) */}
+        <div className="absolute inset-0 opacity-80" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='80' r='1.5' fill='%236366f1' opacity='0.6'/%3E%3Ccircle cx='150' cy='40' r='1' fill='%2394a3b8' opacity='0.4'/%3E%3Ccircle cx='250' cy='100' r='1.8' fill='%236366f1' opacity='0.5'/%3E%3Ccircle cx='350' cy='60' r='1' fill='%2394a3b8' opacity='0.3'/%3E%3Ccircle cx='100' cy='180' r='1.2' fill='%2306b6d4' opacity='0.5'/%3E%3Ccircle cx='200' cy='200' r='2' fill='%236366f1' opacity='0.4'/%3E%3Ccircle cx='300' cy='150' r='1' fill='%2394a3b8' opacity='0.3'/%3E%3Ccircle cx='80' cy='300' r='1.5' fill='%2394a3b8' opacity='0.4'/%3E%3Ccircle cx='180' cy='330' r='1' fill='%236366f1' opacity='0.5'/%3E%3Ccircle cx='320' cy='280' r='1.8' fill='%2306b6d4' opacity='0.4'/%3E%3Ccircle cx='380' cy='350' r='1' fill='%2394a3b8' opacity='0.3'/%3E%3Ccircle cx='30' cy='370' r='1.2' fill='%236366f1' opacity='0.4'/%3E%3Cline x1='50' y1='80' x2='150' y2='40' stroke='%236366f1' stroke-width='0.3' opacity='0.15'/%3E%3Cline x1='150' y1='40' x2='250' y2='100' stroke='%2394a3b8' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='250' y1='100' x2='350' y2='60' stroke='%236366f1' stroke-width='0.3' opacity='0.12'/%3E%3Cline x1='100' y1='180' x2='200' y2='200' stroke='%2306b6d4' stroke-width='0.3' opacity='0.12'/%3E%3Cline x1='200' y1='200' x2='300' y2='150' stroke='%2394a3b8' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='50' y1='80' x2='100' y2='180' stroke='%2394a3b8' stroke-width='0.3' opacity='0.08'/%3E%3Cline x1='250' y1='100' x2='200' y2='200' stroke='%236366f1' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='80' y1='300' x2='180' y2='330' stroke='%236366f1' stroke-width='0.3' opacity='0.12'/%3E%3Cline x1='320' y1='280' x2='380' y2='350' stroke='%2306b6d4' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='300' y1='150' x2='320' y2='280' stroke='%2394a3b8' stroke-width='0.3' opacity='0.08'/%3E%3Cline x1='180' y1='330' x2='320' y2='280' stroke='%236366f1' stroke-width='0.3' opacity='0.1'/%3E%3Cline x1='30' y1='370' x2='80' y2='300' stroke='%2394a3b8' stroke-width='0.3' opacity='0.1'/%3E%3C/svg%3E\")" }} />
 
       <div className="w-full max-w-lg relative z-10">
         <div className="text-center mb-10">
@@ -751,7 +764,15 @@ function Dashboard({ user, onGenerate, medicineList, onAddCustomMedicine, isDark
   const isReady = items.length > 0 && patient.name;
 
   return (
-    <div className={`flex flex-col md:flex-row h-full w-full overflow-hidden ${isDarkMode ? 'bg-[#060b18]' : 'bg-slate-50'}`}>
+    <div className={`flex flex-col md:flex-row h-full w-full overflow-hidden relative ${isDarkMode ? 'bg-[#0B0F19]' : 'bg-slate-50'}`}>
+      {isDarkMode && (
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0B0F19] to-black opacity-90" />
+          <div className="absolute inset-0 opacity-10 mix-blend-screen" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50V16l28-16 28 16v34L28 66zm0 34L0 84V50l28-16 28 16v34L28 100z' fill='none' stroke='%236366f1' stroke-width='1' stroke-opacity='1'/%3E%3C/svg%3E\")" }} />
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, #0B0F19 75%)' }} />
+          <div className="absolute inset-0 opacity-20 mix-blend-screen" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ccircle cx='50' cy='80' r='1.5' fill='%236366f1'/%3E%3Ccircle cx='150' cy='40' r='1' fill='%2394a3b8'/%3E%3Ccircle cx='250' cy='100' r='1.8' fill='%236366f1'/%3E%3Ccircle cx='350' cy='60' r='1' fill='%2394a3b8'/%3E%3Ccircle cx='100' cy='180' r='1.2' fill='%2306b6d4'/%3E%3Ccircle cx='200' cy='200' r='2' fill='%236366f1'/%3E%3Ccircle cx='300' cy='150' r='1' fill='%2394a3b8'/%3E%3Ccircle cx='80' cy='300' r='1.5' fill='%2394a3b8'/%3E%3Ccircle cx='180' cy='330' r='1' fill='%236366f1'/%3E%3Ccircle cx='320' cy='280' r='1.8' fill='%2306b6d4'/%3E%3Ccircle cx='380' cy='350' r='1' fill='%2394a3b8'/%3E%3Ccircle cx='30' cy='370' r='1.2' fill='%236366f1'/%3E%3Cline x1='50' y1='80' x2='150' y2='40' stroke='%236366f1' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='150' y1='40' x2='250' y2='100' stroke='%2394a3b8' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='250' y1='100' x2='350' y2='60' stroke='%236366f1' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='100' y1='180' x2='200' y2='200' stroke='%2306b6d4' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='200' y1='200' x2='300' y2='150' stroke='%2394a3b8' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='50' y1='80' x2='100' y2='180' stroke='%2394a3b8' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='250' y1='100' x2='200' y2='200' stroke='%236366f1' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='80' y1='300' x2='180' y2='330' stroke='%236366f1' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='320' y1='280' x2='380' y2='350' stroke='%2306b6d4' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='300' y1='150' x2='320' y2='280' stroke='%2394a3b8' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='180' y1='330' x2='320' y2='280' stroke='%236366f1' stroke-width='0.5' opacity='0.5'/%3E%3Cline x1='30' y1='370' x2='80' y2='300' stroke='%2394a3b8' stroke-width='0.5' opacity='0.5'/%3E%3C/svg%3E\")" }} />
+        </div>
+      )}
       <ConfirmationModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={confirmRemoveItem} title="Remove Item?" message="Remove this medicine from the prescription?" confirmText="Remove" type="danger" />
 
       {/* Mobile tabs */}
