@@ -1855,8 +1855,8 @@ function GuideContent({ isDarkMode }) {
 // ── Guide View (sidebar page) ──
 function GuideView({ isDarkMode }) {
   return (
-    <div className={`p-4 md:p-7 h-full overflow-y-auto ${isDarkMode ? 'bg-[#060b18]' : 'bg-slate-50'}`}>
-      <div className="max-w-3xl mx-auto">
+    <div className={`absolute inset-0 overflow-y-auto p-4 md:p-7 ${isDarkMode ? 'bg-[#060b18]' : 'bg-slate-50'}`}>
+      <div className="max-w-3xl mx-auto pb-8">
         <GuideContent isDarkMode={isDarkMode} />
       </div>
     </div>
@@ -2222,7 +2222,7 @@ export default function App() {
       {currentView === 'auth' && <AuthScreen onAuthSuccess={handleAuthSuccess} db={db} appId={appId} />}
       {currentView === 'onboarding' && <OnboardingScreen onComplete={handleOnboardingComplete} user={user} />}
 
-      {['dashboard', 'prescription', 'history', 'settings', 'medicines', 'support'].includes(currentView) && (
+      {['dashboard', 'prescription', 'history', 'settings', 'medicines', 'support', 'guide'].includes(currentView) && (
         <div className="flex h-full overflow-hidden print:block print:bg-white">
           {/* ── DESKTOP SIDEBAR ── */}
           <aside className={`no-print w-60 flex-col hidden md:flex border-r z-30 relative transition-colors duration-300 ${isDarkMode ? 'bg-[#080e1c] border-white/[0.06]' : 'bg-white border-slate-200'}`}>
