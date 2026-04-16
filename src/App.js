@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  User, Lock, Stethoscope, Plus, Trash2, Printer, LayoutDashboard, Clock, History, Settings, Pill, Save, X, Building, Phone, MapPin, FileBadge, Search, AlertCircle, FileText, LogOut, ShieldCheck, ChevronRight, Activity, QrCode, CheckCircle2, Mail, Eye, EyeOff, Key, ArrowRight, Award, HelpCircle, Sun, Moon, Pencil, Download, Megaphone, AlertTriangle, LifeBuoy, Globe, Database, Camera, Image as ImageIcon
+  User, Lock, Stethoscope, Plus, Trash2, Printer, LayoutDashboard, Clock, History, Settings, Pill, Save, X, Building, Phone, MapPin, FileBadge, Search, AlertCircle, FileText, LogOut, ShieldCheck, ChevronRight, Activity, QrCode, CheckCircle2, Mail, Eye, EyeOff, Key, ArrowRight, Award, HelpCircle, Sun, Moon, Pencil, Download, Megaphone, AlertTriangle, LifeBuoy, Globe, Database, Camera, Image as ImageIcon, BookOpen, ChevronDown, UserPlus, Sparkles, MousePointerClick
 } from 'lucide-react';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, serverTimestamp, getDocs, query, where, limit, onSnapshot, addDoc, deleteDoc } from "firebase/firestore";
@@ -311,6 +311,7 @@ function compressImage(file, maxWidth = 800, quality = 0.7) {
 
 function AuthScreen({ onAuthSuccess, db, appId }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [showGuideModal, setShowGuideModal] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', license: '' });
   const [licenseImage, setLicenseImage] = useState(null);
   const [licensePreview, setLicensePreview] = useState(null);
@@ -404,6 +405,31 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   return (
     <div className="flex min-h-screen w-full bg-[#0B0F19] overflow-y-auto relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0B0F19] to-black opacity-90"></div>
+
+      {/* Guide Modal */}
+      {showGuideModal && (
+        <div className="fixed inset-0 z-[110] flex flex-col bg-[#0B0F19] overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] shrink-0 bg-[#080e1c]/90 backdrop-blur-xl">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-[0_6px_24px_rgba(99,102,241,0.4)]">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-white font-black text-base tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>How to Use MediVend</h2>
+                <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.2em]">Doctor Portal Guide</p>
+              </div>
+            </div>
+            <button onClick={() => setShowGuideModal(false)} className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all active:scale-95">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="max-w-3xl mx-auto">
+              <GuideContent isDarkMode={true} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {showForgotModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-lg p-4">
@@ -594,6 +620,10 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
               </div>
             ))}
           </div>
+          {/* Mobile: How to Use button */}
+          <button onClick={() => setShowGuideModal(true)} className="lg:hidden mt-4 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.06] hover:bg-indigo-500/[0.12] transition-all text-indigo-400 text-xs font-bold uppercase tracking-widest">
+            <BookOpen className="w-3.5 h-3.5" /> How to Use This Portal
+          </button>
           <p className="text-center text-[10px] text-slate-600 mt-4">© 2026 MediVend Systems · Secure & HIPAA-Compliant</p>
         </div>
       </div>
@@ -637,6 +667,17 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
               </div>
             ))}
           </div>
+          {/* How to Use button */}
+          <button onClick={() => setShowGuideModal(true)} className="mt-6 w-full flex items-center gap-3 p-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.06] hover:bg-indigo-500/[0.12] hover:border-indigo-500/35 transition-all duration-300 group cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+              <BookOpen className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 text-left">
+              <div className="font-bold text-white text-sm">How to Use This Portal</div>
+              <div className="text-xs text-slate-500 mt-0.5">Step-by-step guide for all features</div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
       </div>
     </div>
@@ -1623,6 +1664,205 @@ function SupportView({ user, isDarkMode, db, appId }) {
   );
 }
 
+// ── Guide Accordion Section ──
+function GuideSection({ number, icon: Icon, title, subtitle, children, isDarkMode, defaultOpen = false }) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const contentRef = useRef(null);
+  return (
+    <div className={`rounded-2xl border transition-all duration-300 overflow-hidden mb-3 ${
+      isOpen
+        ? (isDarkMode ? 'border-indigo-500/30 bg-indigo-500/[0.04] shadow-[0_0_30px_rgba(99,102,241,0.08)]' : 'border-indigo-200 bg-indigo-50/30 shadow-md shadow-indigo-100/50')
+        : (isDarkMode ? 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]' : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm')
+    }`}>
+      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center gap-4 p-5 text-left transition-all">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shrink-0 transition-all duration-300 ${
+          isOpen
+            ? 'bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-lg shadow-indigo-500/30 scale-110'
+            : (isDarkMode ? 'bg-white/[0.06] border border-white/[0.08] text-slate-500' : 'bg-slate-100 border border-slate-200 text-slate-400')
+        }`}>
+          {isOpen ? <Icon className="w-5 h-5" /> : <span>{number}</span>}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className={`font-black text-sm tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{title}</h3>
+          {subtitle && <p className={`text-xs mt-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{subtitle}</p>}
+        </div>
+        <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isDarkMode ? 'text-slate-600' : 'text-slate-400'} ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <div
+        ref={contentRef}
+        style={{ maxHeight: isOpen ? (contentRef.current?.scrollHeight || 2000) + 'px' : '0px' }}
+        className="transition-all duration-400 ease-in-out overflow-hidden"
+      >
+        <div className={`px-5 pb-5 pt-0 ml-[3.5rem] border-t ${isDarkMode ? 'border-white/[0.04]' : 'border-slate-100'}`}>
+          <div className="pt-4">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Guide Step ──
+function GuideStep({ number, text, isDarkMode, tip }) {
+  return (
+    <div className="flex gap-3 mb-3 last:mb-0">
+      <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5 ${isDarkMode ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/20' : 'bg-indigo-50 text-indigo-600 border border-indigo-200'}`}>
+        {number}
+      </div>
+      <div className="flex-1">
+        <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
+        {tip && (
+          <div className={`mt-2 flex items-start gap-2 p-2.5 rounded-xl text-xs ${isDarkMode ? 'bg-amber-500/[0.06] border border-amber-500/15 text-amber-300/80' : 'bg-amber-50 border border-amber-200 text-amber-700'}`}>
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+            <span>{tip}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Guide Content (shared between modal and page) ──
+function GuideContent({ isDarkMode }) {
+  return (
+    <div>
+      {/* Welcome header */}
+      <div className={`rounded-2xl border p-6 mb-6 ${isDarkMode ? 'bg-gradient-to-br from-indigo-500/[0.08] to-blue-500/[0.04] border-indigo-500/20' : 'bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-200'}`}>
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 shrink-0">
+            <Stethoscope className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className={`font-black text-lg tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Welcome to MediVend Doctor Portal</h2>
+            <p className={`text-sm mt-1 leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              Your digital prescription management system. This guide walks you through every feature — from registration to printing prescriptions.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {[
+                { icon: <LayoutDashboard className="w-3 h-3" />, label: 'Write Rx' },
+                { icon: <Printer className="w-3 h-3" />, label: 'Print' },
+                { icon: <History className="w-3 h-3" />, label: 'History' },
+                { icon: <Pill className="w-3 h-3" />, label: 'Inventory' },
+                { icon: <Settings className="w-3 h-3" />, label: 'Settings' },
+              ].map(({ icon, label }) => (
+                <span key={label} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'bg-white/[0.06] text-slate-400 border border-white/[0.08]' : 'bg-white text-slate-500 border border-slate-200'}`}>
+                  {icon} {label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 1 */}
+      <GuideSection number="1" icon={UserPlus} title="Getting Started" subtitle="Registration, login & account approval" isDarkMode={isDarkMode} defaultOpen={true}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text='Navigate to the MediVend Doctor Portal. You will see the login page with a "Welcome back" header.' />
+        <GuideStep isDarkMode={isDarkMode} number="2" text='Click "Create account" at the bottom of the form to switch to the registration view.' />
+        <GuideStep isDarkMode={isDarkMode} number="3" text="Fill in your Full Name, PRC License Number, Email Address, and Password." />
+        <GuideStep isDarkMode={isDarkMode} number="4" text="Upload a clear photo of your PRC License ID by clicking the camera icon in the PRC Photo area. This is required for verification." tip="Make sure your PRC License photo is clear and readable. Blurry photos can delay approval." />
+        <GuideStep isDarkMode={isDarkMode} number="5" text="Upload a selfie photo of yourself by clicking the Owner Selfie area. This helps verify your identity." />
+        <GuideStep isDarkMode={isDarkMode} number="6" text='Click "Create Account" to submit your registration. Your account will be placed in Pending status for admin review.' tip="Your account must be approved by the admin before you can log in. This normally takes a few hours." />
+        <GuideStep isDarkMode={isDarkMode} number="7" text='Once approved, return to the login page, enter your email and password, and click "Sign In".'/>
+        <GuideStep isDarkMode={isDarkMode} number="8" text='If you forgot your password, click "Forgot Password?" on the login form. You will be directed to contact customer service at 09273523900.' />
+      </GuideSection>
+
+      {/* Section 2 */}
+      <GuideSection number="2" icon={Building} title="Clinic Setup" subtitle="One-time onboarding after first login" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text="After your first successful login, you will see the Clinic Setup screen. This only appears once." />
+        <GuideStep isDarkMode={isDarkMode} number="2" text="Enter your Clinic/Hospital Name — this will appear as the header on every prescription you generate." />
+        <GuideStep isDarkMode={isDarkMode} number="3" text="Enter the Full Address of your clinic. This also appears on your prescriptions." />
+        <GuideStep isDarkMode={isDarkMode} number="4" text="Provide your clinic Contact Number and PTR Number (Professional Tax Receipt)." />
+        <GuideStep isDarkMode={isDarkMode} number="5" text="If applicable, enter your S2 License number. This field is optional." />
+        <GuideStep isDarkMode={isDarkMode} number="6" text='Click "Save & Continue" to finalize. You can update these details later in Settings > Clinic.' tip="All clinic details appear on printed prescriptions, so make sure they are accurate and complete." />
+      </GuideSection>
+
+      {/* Section 3 */}
+      <GuideSection number="3" icon={LayoutDashboard} title="Prescription Writer" subtitle="Creating prescriptions step-by-step" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text='Navigate to the "Writer" page from the sidebar (this is the default view after login).' />
+        <GuideStep isDarkMode={isDarkMode} number="2" text="Fill in the Patient Information card: enter the patient's Full Name, Age, and Sex." tip="The patient name is required before you can generate a prescription." />
+        <GuideStep isDarkMode={isDarkMode} number="3" text='In the "Prescribe Medicine" section, use the search bar to find a medicine by name. A dropdown will show matching results from your inventory.' tip="Always use the generic (major) name of the medicine, not the brand name. For example, use 'Paracetamol' instead of 'Biogesic', or 'Amoxicillin' instead of 'Amoxil'. This ensures proper matching with the kiosk inventory." />
+        <GuideStep isDarkMode={isDarkMode} number="4" text="Select a medicine from the dropdown. Its dosage and price will auto-fill." />
+        <GuideStep isDarkMode={isDarkMode} number="5" text='If the medicine is not in the database, click "+ Custom" to add it manually with a name, dosage, and price.' />
+        <GuideStep isDarkMode={isDarkMode} number="6" text="Set the Quantity, adjust Dosage Form and Unit Price if needed, and type Instructions (e.g., '1 tab after meals')." />
+        <GuideStep isDarkMode={isDarkMode} number="7" text='Click "Add to Prescription" to add the item to your prescription list. Repeat for each medicine.' />
+        <GuideStep isDarkMode={isDarkMode} number="8" text="To edit an item, click the pencil icon next to it. The form will populate with that item's details for editing." />
+        <GuideStep isDarkMode={isDarkMode} number="9" text="To remove an item, click the trash icon. A confirmation dialog will appear." />
+        <GuideStep isDarkMode={isDarkMode} number="10" text="The right panel (or 'Preview' tab on mobile) shows a real-time preview of how the prescription will look when printed." />
+        <GuideStep isDarkMode={isDarkMode} number="11" text='When ready, click the "Generate Prescription" button at the bottom. This button activates once you have at least one medicine and a patient name.' />
+      </GuideSection>
+
+      {/* Section 4 */}
+      <GuideSection number="4" icon={Printer} title="Preview & Printing" subtitle="Reviewing, printing, and saving prescriptions" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text="After generating, you'll see the full prescription layout with a unique QR code, patient details, medicine table, and doctor signature area." />
+        <GuideStep isDarkMode={isDarkMode} number="2" text='Click "Print" to send the prescription directly to your printer.' />
+        <GuideStep isDarkMode={isDarkMode} number="3" text='Click "PDF" to save/download the prescription as a PDF file via your browser&#39;s print dialog.' />
+        <GuideStep isDarkMode={isDarkMode} number="4" text='Click "New Rx" (Save & New) to save this prescription to the database and immediately start a new blank prescription.' tip="This is the recommended workflow — it saves the record to your history for future reference." />
+        <GuideStep isDarkMode={isDarkMode} number="5" text='Click "Cancel" to discard the prescription without saving. A confirmation prompt will appear.' />
+        <GuideStep isDarkMode={isDarkMode} number="6" text='Click "Back to Editor" to return and make changes before printing.' />
+      </GuideSection>
+
+      {/* Section 5 */}
+      <GuideSection number="5" icon={History} title="Prescription History" subtitle="Viewing past prescription records" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text='Navigate to "History" in the sidebar. All prescriptions you&#39;ve saved are listed here.' />
+        <GuideStep isDarkMode={isDarkMode} number="2" text="Each record shows the Date, Patient Name, Prescription ID, and Total Amount." />
+        <GuideStep isDarkMode={isDarkMode} number="3" text="To hide a specific record, hover over it and click the trash icon. This hides it from your view only — the record remains in the database." />
+        <GuideStep isDarkMode={isDarkMode} number="4" text='To clear all records from your view, click "Clear View" at the top. Again, records remain in the database.' tip="Hidden records are for your view only. The admin can still see all records in the system." />
+      </GuideSection>
+
+      {/* Section 6 */}
+      <GuideSection number="6" icon={Pill} title="Medicine Inventory" subtitle="Managing your medicine database" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text='Go to "Medicines" in the sidebar to view your full medicine inventory.' />
+        <GuideStep isDarkMode={isDarkMode} number="2" text='Medicines with a "Global" badge are managed by the admin and shared across all doctors. Personal medicines are ones you&#39;ve added yourself.' />
+        <GuideStep isDarkMode={isDarkMode} number="3" text='Click "Add Medicine" to create a new custom medicine with a name, dosage form, and unit price.' />
+        <GuideStep isDarkMode={isDarkMode} number="4" text="Use the search bar at the top to quickly find a specific medicine by name." />
+        <GuideStep isDarkMode={isDarkMode} number="5" text="To remove a medicine, click the trash icon on hover. Global items are hidden from your view, while personal items are permanently deleted." tip="Global medicines are set by the admin to ensure consistent pricing and availability across all doctors." />
+      </GuideSection>
+
+      {/* Section 7 */}
+      <GuideSection number="7" icon={Settings} title="Settings" subtitle="Profile, clinic details & security" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text='Open "Settings" from the sidebar. You&#39;ll see three tabs: My Profile, Clinic, and Security.' />
+        <GuideStep isDarkMode={isDarkMode} number="2" text='My Profile — Update your display name and PRC license number. Your email is read-only and cannot be changed. Click "Save Profile" when done.' />
+        <GuideStep isDarkMode={isDarkMode} number="3" text='Clinic — Modify your clinic name, address, contact number, PTR number, and S2 license. These details appear on every printed prescription. Click "Update Clinic" to save.' />
+        <GuideStep isDarkMode={isDarkMode} number="4" text='Security — Change your account password by entering your current password, then your new password (and confirming it). Click "Change Password" to update.' tip="Choose a strong password with a mix of letters, numbers, and symbols for better security." />
+      </GuideSection>
+
+      {/* Section 8 */}
+      <GuideSection number="8" icon={LifeBuoy} title="Support Tickets" subtitle="Getting help when you need it" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text='Navigate to "Support" in the sidebar to view and manage your support tickets.' />
+        <GuideStep isDarkMode={isDarkMode} number="2" text='Click "New Ticket" to open the submission form. Enter a subject line describing your issue briefly.' />
+        <GuideStep isDarkMode={isDarkMode} number="3" text="Write a detailed message explaining the issue. The more detail you provide, the faster it can be resolved." />
+        <GuideStep isDarkMode={isDarkMode} number="4" text='Choose a priority level: Low (general question), Normal (standard issue), or High (urgent/blocker). Then click "Submit Ticket".' />
+        <GuideStep isDarkMode={isDarkMode} number="5" text="Track your ticket status in the table. Statuses are: Open (new), In Progress (being worked on), and Resolved (completed)." />
+        <GuideStep isDarkMode={isDarkMode} number="6" text="To hide a ticket from your view, click the trash icon on hover." />
+      </GuideSection>
+
+      {/* Section 9 */}
+      <GuideSection number="9" icon={Sparkles} title="Additional Features" subtitle="Dark mode, broadcasts & mobile navigation" isDarkMode={isDarkMode}>
+        <GuideStep isDarkMode={isDarkMode} number="1" text="Dark/Light Mode — Use the toggle switch in the header bar (top-right) to switch between dark and light themes. Your preference is saved automatically." />
+        <GuideStep isDarkMode={isDarkMode} number="2" text="Broadcast Messages — The admin can send system-wide messages. These appear as notification banners at the top of the Prescription Writer page. Click the X to dismiss." />
+        <GuideStep isDarkMode={isDarkMode} number="3" text="Mobile Navigation — On mobile devices, the sidebar is replaced with a bottom navigation bar. All the same features (Writer, History, Medicines, Settings, Support, Guide) are accessible from the bottom tabs." />
+        <GuideStep isDarkMode={isDarkMode} number="4" text="QR Codes — Each generated prescription has a unique QR code that can be scanned at MediVend kiosks for instant verification and fulfillment." />
+      </GuideSection>
+
+      {/* Footer */}
+      <div className={`mt-6 p-5 rounded-2xl text-center border ${isDarkMode ? 'border-white/[0.06] bg-white/[0.02]' : 'border-slate-200 bg-slate-50'}`}>
+        <p className={`text-sm font-bold ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>Need more help?</p>
+        <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>Contact support at <span className="text-indigo-400 font-bold">09273523900</span> or submit a support ticket from the Support page.</p>
+      </div>
+    </div>
+  );
+}
+
+// ── Guide View (sidebar page) ──
+function GuideView({ isDarkMode }) {
+  return (
+    <div className={`p-4 md:p-7 h-full overflow-y-auto ${isDarkMode ? 'bg-[#060b18]' : 'bg-slate-50'}`}>
+      <div className="max-w-3xl mx-auto">
+        <GuideContent isDarkMode={isDarkMode} />
+      </div>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MAIN APP
 // ═══════════════════════════════════════════════════════════════
@@ -1757,6 +1997,7 @@ export default function App() {
     { id: 'dashboard', icon: <LayoutDashboard />, label: 'Writer', section: 'clinical' },
     { id: 'history', icon: <History />, label: 'History', section: 'clinical' },
     { id: 'medicines', icon: <Pill />, label: 'Medicines', section: 'management' },
+    { id: 'guide', icon: <BookOpen />, label: 'Guide', section: 'system' },
     { id: 'settings', icon: <Settings />, label: 'Settings', section: 'system' },
     { id: 'support', icon: <LifeBuoy />, label: 'Support', section: 'system' },
   ];
@@ -1768,6 +2009,7 @@ export default function App() {
     prescription: { label: 'Prescription Preview', icon: <Printer className="w-4 h-4 text-indigo-400" /> },
     support: { label: 'Support & Help', icon: <LifeBuoy className="w-4 h-4 text-amber-400" /> },
     settings: { label: 'Account Settings', icon: <Settings className="w-4 h-4 text-slate-400" /> },
+    guide: { label: 'How to Use', icon: <BookOpen className="w-4 h-4 text-violet-400" /> },
   };
 
   return (
@@ -2062,6 +2304,7 @@ export default function App() {
               {currentView === 'medicines' && <MedicineManager medicines={displayedMedicines} onAdd={handleAddMedicine} onDelete={handleDeleteMedicine} isDarkMode={isDarkMode} />}
               {currentView === 'settings' && <SettingsView user={user} onUpdateUser={handleUpdateUser} onLogout={handleLogout} isDarkMode={isDarkMode} />}
               {currentView === 'support' && <SupportView user={user} isDarkMode={isDarkMode} db={db} appId={appId} />}
+              {currentView === 'guide' && <GuideView isDarkMode={isDarkMode} />}
               {currentView === 'prescription' && <PrescriptionView data={currentPrescription} doctor={user} onBack={() => setCurrentView('dashboard')} onCancel={() => setIsDiscardModalOpen(true)} onNew={() => setIsSaveModalOpen(true)} />}
             </main>
 
