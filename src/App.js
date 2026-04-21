@@ -21,14 +21,16 @@ const db = getFirestore(app);
 const appId = 'medivend-local';
 
 const DEFAULT_MEDICINES = [
-  { id: 1, name: 'Amoxicillin', dosage: '500mg Cap', price: 15.00 },
-  { id: 2, name: 'Paracetamol', dosage: '500mg Tab', price: 5.00 },
-  { id: 3, name: 'Ibuprofen', dosage: '200mg Tab', price: 8.00 },
-  { id: 4, name: 'Cetirizine', dosage: '10mg Tab', price: 12.50 },
-  { id: 5, name: 'Omeprazole', dosage: '20mg Cap', price: 25.00 },
-  { id: 6, name: 'Metformin', dosage: '500mg Tab', price: 10.00 },
-  { id: 7, name: 'Vitamin C', dosage: '500mg Tab', price: 7.00 },
-  { id: 8, name: 'Azithromycin', dosage: '500mg Tab', price: 85.00 },
+  { id: 1, name: 'Acetylcysteine', dosage: '600mg Sachet', price: 45.00 },
+  { id: 2, name: 'Diosmectite', dosage: '3g Sachet', price: 35.00 },
+  { id: 3, name: 'Sodium Alginate', dosage: '10ml Sachet', price: 30.00 },
+  { id: 4, name: 'Oral Rehydration Salts', dosage: '4.1g/5.1g Sachet', price: 12.00 },
+  { id: 5, name: 'Saccharomyces boulardii', dosage: '250mg Sachet', price: 45.00 },
+  { id: 6, name: 'Losartan', dosage: '50mg Tab', price: 5.00 },
+  { id: 7, name: 'Amlodipine', dosage: '5mg Tab', price: 3.00 },
+  { id: 8, name: 'Metformin', dosage: '500mg Tab', price: 3.00 },
+  { id: 9, name: 'Co-Amoxiclav', dosage: '625mg Tab', price: 20.00 },
+  { id: 10, name: 'Celecoxib', dosage: '200mg Cap', price: 15.00 },
 ];
 
 // ── Ripple hook ──
@@ -317,6 +319,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
   const [licensePreview, setLicensePreview] = useState(null);
   const [selfieImage, setSelfieImage] = useState(null);
   const [selfiePreview, setSelfiePreview] = useState(null);
+  const [photoSelectionTarget, setPhotoSelectionTarget] = useState(null); // 'license' | 'selfie' | null
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [pendingUserEmail, setPendingUserEmail] = useState(null);
@@ -333,10 +336,6 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file (JPG, PNG, etc.)');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Image must be less than 10MB.');
       return;
     }
     try {
@@ -505,12 +504,11 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                       {/* License Photo Upload */}
                       <div>
                         <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">PRC License <span className="text-rose-400">*</span></label>
-                        <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={(e) => handleImageSelect(e, 'license')} className="hidden" />
                         {licensePreview ? (
                           <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
                             <img src={licensePreview} alt="License Preview" className="w-full h-32 object-cover" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2">
-                              <button type="button" onClick={() => fileInputRef.current?.click()} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
+                              <button type="button" onClick={() => setPhotoSelectionTarget('license')} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
                                 <Camera className="w-3 h-3" /> Retake
                               </button>
                               <button type="button" onClick={() => { setLicenseImage(null); setLicensePreview(null); }} className="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
@@ -522,7 +520,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                             </div>
                           </div>
                         ) : (
-                          <button type="button" onClick={() => fileInputRef.current?.click()}
+                          <button type="button" onClick={() => setPhotoSelectionTarget('license')}
                             className="w-full py-4 px-2 h-32 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-indigo-500/40 bg-white/[0.02] hover:bg-indigo-500/[0.05] transition-all flex flex-col items-center justify-center gap-1.5 group cursor-pointer">
                             <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                               <Camera className="w-4 h-4 text-indigo-400" />
@@ -534,12 +532,11 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                       {/* Selfie Photo Upload */}
                       <div>
                         <label className="block text-[9px] font-black uppercase tracking-[0.15em] mb-2 text-slate-500">Your Selfie <span className="text-rose-400">*</span></label>
-                        <input ref={selfieInputRef} type="file" accept="image/*" capture="user" onChange={(e) => handleImageSelect(e, 'selfie')} className="hidden" />
                         {selfiePreview ? (
                           <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] group">
                             <img src={selfiePreview} alt="Selfie Preview" className="w-full h-32 object-cover" />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2">
-                              <button type="button" onClick={() => selfieInputRef.current?.click()} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
+                              <button type="button" onClick={() => setPhotoSelectionTarget('selfie')} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-indigo-500 transition-all">
                                 <Camera className="w-3 h-3" /> Retake
                               </button>
                               <button type="button" onClick={() => { setSelfieImage(null); setSelfiePreview(null); }} className="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-[10px] font-bold flex items-center gap-1.5 hover:bg-rose-500 transition-all">
@@ -551,7 +548,7 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
                             </div>
                           </div>
                         ) : (
-                          <button type="button" onClick={() => selfieInputRef.current?.click()}
+                          <button type="button" onClick={() => setPhotoSelectionTarget('selfie')}
                             className="w-full py-4 px-2 h-32 rounded-2xl border-2 border-dashed border-white/[0.1] hover:border-cyan-500/40 bg-white/[0.02] hover:bg-cyan-500/[0.05] transition-all flex flex-col items-center justify-center gap-1.5 group cursor-pointer">
                             <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                               <User className="w-4 h-4 text-cyan-400" />
@@ -627,6 +624,54 @@ function AuthScreen({ onAuthSuccess, db, appId }) {
           <p className="text-center text-[10px] text-slate-600 mt-4">© 2026 MediVend Systems · Secure & HIPAA-Compliant</p>
         </div>
       </div>
+
+      {/* ════════════ PHOTO SELECTION MODAL ════════════ */}
+      {photoSelectionTarget && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-lg p-4 animate-modal-fade">
+          <div className="bg-[#0d1220] rounded-3xl p-6 w-full max-w-sm border border-indigo-500/20 shadow-[0_0_80px_rgba(99,102,241,0.08)]">
+            <h3 className="text-white text-lg font-black tracking-tight mb-5 text-center">
+              Upload {photoSelectionTarget === 'license' ? 'PRC License' : 'Your Selfie'}
+            </h3>
+            
+            <div className="flex flex-col gap-3">
+              {/* Camera Option */}
+              <label className="bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-colors cursor-pointer border border-indigo-500/30">
+                <span className="text-xl">📷</span> Take Photo
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  capture={photoSelectionTarget === 'license' ? 'environment' : 'user'} 
+                  onChange={(e) => {
+                    handleImageSelect(e, photoSelectionTarget);
+                    setPhotoSelectionTarget(null);
+                  }} 
+                  className="hidden" 
+                />
+              </label>
+              
+              {/* Gallery Option */}
+              <label className="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-colors cursor-pointer border border-cyan-500/30">
+                <span className="text-xl">🖼️</span> Choose from Gallery
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => {
+                    handleImageSelect(e, photoSelectionTarget);
+                    setPhotoSelectionTarget(null);
+                  }} 
+                  className="hidden" 
+                />
+              </label>
+
+              <button type="button"
+                onClick={() => setPhotoSelectionTarget(null)}
+                className="mt-3 text-slate-500 hover:text-white py-2 text-sm font-bold transition-colors">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* RIGHT: Hero */}
       <div className={`hidden lg:flex flex-1 relative overflow-hidden flex-col items-center justify-center p-12 transition-all duration-700 delay-200 border-l border-white/5 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
